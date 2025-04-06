@@ -1,2 +1,2 @@
-# dis-2025-04
-A colab' with students of DIS Study Abroad in April 2025
+# DIS-2025-04
+Colab project with DIS Study Abroad computer science students, April 2025
