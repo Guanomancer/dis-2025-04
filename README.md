@@ -11,7 +11,7 @@ You can find more info here: [SmartMerge](https://docs.unity3d.com/Manual/SmartM
 
 ### Windows
 - Locate your git repo folder. If you're using Github For Desktop simply press Ctrl + Shift + F to open the folder in Windows Explorer.
-- Create a file named .gitconfig
+- Create a file named .gitconfig in the Unity project folder.
 - Open the file in Notepad, VS Code or any other code editor, and paste in the following:
   - Please check that the path at the "cmd = 'C:\Prog..." is correct.
   - Change the editor version (6000.0.45f1) to match your current version.
@@ -26,7 +26,7 @@ You can find more info here: [SmartMerge](https://docs.unity3d.com/Manual/SmartM
 
 ### Mac OSX
 - Locate your git repo folder. If you're using Github For Desktop simply press Command + Apple + Donut + Fruitfly to (maybe) open the folder in that thing that does the thing on Mac OSX.
-- Create a file named .gitconfig
+- Create a file named .gitconfigin the Unity project folder.
 - Open the file in VS Code or any other code editor, and paste in the following:
   - Please check that the path at the "cmd = '/Applica..." is correct.
   - Change the editor version (6000.0.45f1) to match your current version.
