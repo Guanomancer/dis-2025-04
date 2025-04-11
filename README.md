@@ -3,7 +3,7 @@ Colab project with DIS Study Abroad computer science students, April 2025
 
 Contributers:
 (Name, Organization, Role)
-Ethan, DIS computer science student, Systems Engineering for Unity plugin.
+Ethan Kabatchnik, DIS computer science student, Systems Engineering for Unity plugin.
 Sarah Than, DIS computer science student, UI and UX engineering for Unity plugin.
 Troels Windekilde, Guanomancer ApS, Lead and Web app development.
 
