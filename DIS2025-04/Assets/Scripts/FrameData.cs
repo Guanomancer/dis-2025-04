@@ -52,7 +52,7 @@ public class FrameData : MonoBehaviour
         Debug.Log("Device ID: " + data.DeviceID);
         Debug.Log("Frame Index: " + data.FrameIndex);
         Debug.Log("Handedness: " + data.Handedness);
-        
+        Debug.Log(data.Keypoints);
     }
 }
 
