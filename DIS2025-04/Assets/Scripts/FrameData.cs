@@ -9,3 +9,8 @@ public class Keypoint
     public string name { get; set; }
 
 }
+
+public class Keypoint3D: Keypoint
+{
+    public double z { get; set; }
+}
