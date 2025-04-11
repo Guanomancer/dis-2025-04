@@ -4,13 +4,13 @@ using System.Collections.Generic;
 
 public class Keypoint
 {
-    public double x {  get; set; }
-    public double y { get; set; }
-    public string name { get; set; }
+    public double X {  get; set; }
+    public double Y { get; set; }
+    public string Name { get; set; }
 
 }
 
 public class Keypoint3D: Keypoint
 {
-    public double z { get; set; }
+    public double Z { get; set; }
 }
