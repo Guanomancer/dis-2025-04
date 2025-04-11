@@ -14,3 +14,12 @@ public class Keypoint3D: Keypoint
 {
     public double Z { get; set; }
 }
+
+public class Point3D: Keypoint
+{
+    public double X3D { get; set; }
+    public double Y3D { get; set; }
+    public double Z3D { get; set; }
+
+}
+
