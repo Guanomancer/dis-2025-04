@@ -23,3 +23,16 @@ public class Point3D: Keypoint
 
 }
 
+public class HandTrackingData
+{
+    public string DeviceID { get; set; }
+    public int FrameIndex { get; set; }
+    public string Handedness { get; set; }
+    public int Confidence { get; set; }
+
+    public List<Keypoint> Keypoints;
+    public List<Keypoint3D> Keypoints3D;
+    public List<Point3D> Points3D;
+
+}
+
