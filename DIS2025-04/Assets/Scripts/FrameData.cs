@@ -140,6 +140,8 @@ public class FrameData : MonoBehaviour
 
         innerData.Remove("keypoints3D");
 
+        // Parse non-JArray data
+        handTrackingData.Points3D = new Dictionary<string, Point3D>();
         foreach (var property in innerData.Properties())
         {
             if (property.Value.Type != JTokenType.Object)
@@ -151,10 +153,20 @@ public class FrameData : MonoBehaviour
                 {
                     handTrackingData.Confidence = (float)property.Value;
                 }
+                continue;
             }
-        }
+            Point3D current = new Point3D();
 
-        
+            current.X = property.Value["x"].ToObject<double>();
+            current.Y = property.Value["y"].ToObject<double>();
+            current.X3D = property.Value["x3D"].ToObject<double>();
+            current.Y3D = property.Value["y3D"].ToObject<double>();
+            current.Z3D = property.Value["z3D"].ToObject<double>();
+            current.Name = property.Name.ToString();
+
+            handTrackingData.Points3D.Add(current.Name, current);
+
+        }
 
         Debug.Log("Device ID: " + handTrackingData.DeviceID);
         Debug.Log("Frame Index: " + handTrackingData.FrameIndex);
@@ -163,6 +175,7 @@ public class FrameData : MonoBehaviour
         Debug.Log(innerData.ToString());
         Debug.Log(handTrackingData.Keypoints["wrist"]);
         Debug.Log(handTrackingData.Keypoints3D["wrist"]);
+        Debug.Log(handTrackingData.Points3D["wrist"]);
 
         // Debug.Log(keypoints3D.ToString());
 
