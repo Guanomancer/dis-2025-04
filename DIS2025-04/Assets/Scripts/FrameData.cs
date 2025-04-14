@@ -144,8 +144,10 @@ public class FrameData : MonoBehaviour
         Debug.Log("Frame Index: " + handTrackingData.FrameIndex);
         // Debug.Log(innerData.ToString());
         Debug.Log(handTrackingData.Keypoints["wrist"]);
+        Debug.Log(handTrackingData.Keypoints3D["wrist"]);
+
         // Debug.Log(keypoints3D.ToString());
-        
+
 
 
 
