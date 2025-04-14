@@ -10,11 +10,22 @@ public class Keypoint
     public double Y { get; set; }
     public string Name { get; set; }
 
+    public override string ToString()
+    {
+        return $"(Name: {Name}, X: {X}, Y: {Y})";
+    }
+
 }
 
 public class Keypoint3D: Keypoint
 {
     public double Z { get; set; }
+
+    public override string ToString()
+    {
+        return $"(Name: {Name}, X: {X}, Y: {Y}, Z: {Z})";
+    }
+
 }
 
 public class Point3D: Keypoint
@@ -22,6 +33,11 @@ public class Point3D: Keypoint
     public double X3D { get; set; }
     public double Y3D { get; set; }
     public double Z3D { get; set; }
+
+    public override string ToString()
+    {
+        return $"(Name: {Name}, X: {X}, Y: {Y}, X3D: {X3D}, Y3D: {Y3D}, Z3D: {Z3D})";
+    }
 
 }
 
@@ -49,6 +65,8 @@ public class FrameData : MonoBehaviour
         string deviceId = outer["deviceId"].ToString();
         int frameIndex = outer["frameIndex"].ToObject<int>();
         string frameDataJson = outer["frameData"].ToString();
+
+        HandTrackingData handData = JsonConvert.DeserializeObject<HandTrackingData>(frameDataJson);
 
         // Output some data to the console
         Debug.Log("Device ID: " + deviceId);
