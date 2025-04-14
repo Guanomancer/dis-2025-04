@@ -3,18 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Keypoint
-{
-    public double X {  get; set; }
-    public double Y { get; set; }
-    public string Name { get; set; }
 
-    public override string ToString()
-    {
-        return $"(Name: {Name}, X: {X}, Y: {Y})";
-    }
-
-}
 
 public class Keypoint3D: Keypoint
 {
