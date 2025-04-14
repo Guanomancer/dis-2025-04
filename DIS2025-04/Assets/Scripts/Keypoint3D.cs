@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 public class Keypoint3D : Keypoint
 {
@@ -12,6 +13,26 @@ public class Keypoint3D : Keypoint
         X = x;
         Y = y;
         Z = y;
+    }
+
+    public Keypoint3D(string name, Vector3 vec)
+    {
+        Name = name;
+        X = vec.x;
+        Y = vec.y;
+        Z = vec.z;
+    }
+
+    public Vector2 ToVector3()
+    {
+        return (new Vector3((float)X, (float)Y, (float)Z));
+    }
+
+    public static implicit operator Vector3(Keypoint3D k) => new Vector3((float)k.X, (float)k.Y, (float)k.Z);
+
+    public static Keypoint3D FromVector3(string name, Vector3 vec)
+    {
+        return new Keypoint3D(name, vec);
     }
 
     public override string ToString()
