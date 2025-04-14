@@ -52,6 +52,41 @@ public class HandTrackingData
     public Dictionary<String, Keypoint3D> Keypoints3D;
     public Dictionary<String, Point3D> Points3D;
 
+    public void Print()
+    {
+        Console.WriteLine($"DeviceID: {DeviceID}");
+        Console.WriteLine($"FrameIndex: {FrameIndex}");
+        Console.WriteLine($"Handedness: {Handedness}");
+        Console.WriteLine($"Confidence: {Confidence}");
+
+        if (Keypoints != null)
+        {
+            Console.WriteLine("Keypoints:");
+            foreach (var kvp in Keypoints)
+            {
+                Console.WriteLine($"  {kvp.Key}: {kvp.Value}");
+            }
+        }
+
+        if (Keypoints3D != null)
+        {
+            Console.WriteLine("Keypoints3D:");
+            foreach (var kvp in Keypoints3D)
+            {
+                Console.WriteLine($"  {kvp.Key}: {kvp.Value}");
+            }
+        }
+
+        if (Points3D != null)
+        {
+            Console.WriteLine("Points3D:");
+            foreach (var kvp in Points3D)
+            {
+                Console.WriteLine($"  {kvp.Key}: {kvp.Value}");
+            }
+        }
+    }
+
 }
 
 public class FrameData : MonoBehaviour
