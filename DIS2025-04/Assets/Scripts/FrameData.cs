@@ -1,10 +1,7 @@
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Playables;
 
 public class Keypoint
 {
@@ -168,19 +165,7 @@ public class FrameData : MonoBehaviour
 
         }
 
-        Debug.Log("Device ID: " + handTrackingData.DeviceID);
-        Debug.Log("Frame Index: " + handTrackingData.FrameIndex);
-        Debug.Log("Confidence: " + handTrackingData.Confidence);
-        Debug.Log("Handedness: " + handTrackingData.Handedness);
-        Debug.Log(innerData.ToString());
-        Debug.Log(handTrackingData.Keypoints["wrist"]);
-        Debug.Log(handTrackingData.Keypoints3D["wrist"]);
-        Debug.Log(handTrackingData.Points3D["wrist"]);
-
-        // Debug.Log(keypoints3D.ToString());
-
-
-
+        Debug.Log(handTrackingData.ToString());
 
     }
 }
