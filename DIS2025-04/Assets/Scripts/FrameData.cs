@@ -106,8 +106,6 @@ public class FrameData : MonoBehaviour
         JObject innerData = (JObject)JArray.Parse(outer["frameData"].ToString())[0];
         JArray keypoints = (JArray)innerData["keypoints"];
         JArray keypoints3D = (JArray)innerData["keypoints3D"];
-        handTrackingData.Confidence = innerData["confidence"].ToObject<float>();
-        handTrackingData.Handedness = innerData["handedness"].ToString();
 
         // Parse keypoint data
         handTrackingData.Keypoints = new Dictionary<string, Keypoint>();
@@ -123,6 +121,8 @@ public class FrameData : MonoBehaviour
             handTrackingData.Keypoints.Add(current.Name, current);
         }
 
+        innerData.Remove("keypoints");
+
         // Parse keypoint3d data
         handTrackingData.Keypoints3D = new Dictionary<string, Keypoint3D>();
 
@@ -137,6 +137,24 @@ public class FrameData : MonoBehaviour
 
             handTrackingData.Keypoints3D.Add(current.Name, current);
         }
+
+        innerData.Remove("keypoints3D");
+
+        foreach (var property in innerData.Properties())
+        {
+            if (property.Value.Type != JTokenType.Object)
+            {
+                if (property.Name == "handedness")
+                {
+                    handTrackingData.Handedness = property.Value.ToString();
+                } else
+                {
+                    handTrackingData.Confidence = (float)property.Value;
+                }
+            }
+        }
+
+        
 
         Debug.Log("Device ID: " + handTrackingData.DeviceID);
         Debug.Log("Frame Index: " + handTrackingData.FrameIndex);
