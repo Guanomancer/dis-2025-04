@@ -1,33 +1,6 @@
 using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
-
-
-
-public class Keypoint3D: Keypoint
-{
-    public double Z { get; set; }
-
-    public override string ToString()
-    {
-        return $"(Name: {Name}, X: {X}, Y: {Y}, Z: {Z})";
-    }
-
-}
-
-public class Point3D: Keypoint
-{
-    public double X3D { get; set; }
-    public double Y3D { get; set; }
-    public double Z3D { get; set; }
-
-    public override string ToString()
-    {
-        return $"(Name: {Name}, X: {X}, Y: {Y}, X3D: {X3D}, Y3D: {Y3D}, Z3D: {Z3D})";
-    }
-
-}
 
 public class HandTrackingData
 {

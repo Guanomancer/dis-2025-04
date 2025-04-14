@@ -8,7 +8,7 @@ public class Keypoint
 
     public Keypoint() { }
 
-    public Keypoint(string name, double x, double y, double? z = null)
+    public Keypoint(string name, double x, double y)
     {
         Name = name;
         X = x;
@@ -27,6 +27,11 @@ public class Keypoint
             return false;
 
         return Name == other.Name && X == other.X && Y == other.Y;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Name, X, Y);
     }
 
     // Clone method
