@@ -3,9 +3,9 @@ Colab project with DIS Study Abroad computer science students, April 2025
 
 Contributers:
 (Name, Organization, Role)
-Ethan Kabatchnik, DIS computer science student, Systems Engineering for Unity plugin.
-Sarah Than, DIS computer science student, UI and UX engineering for Unity plugin.
-Troels Windekilde, Guanomancer ApS, Lead and Web app development.
+- Ethan Kabatchnik, DIS computer science student, Systems Engineering for Unity plugin.
+- Sarah Than, DIS computer science student, UI and UX engineering for Unity plugin.
+- Troels Windekilde, Guanomancer ApS, Lead and Web app development.
 
 ## Brief
 This is a 3-part project, consisting of a web front- and backend for capturing hand gesture data, and a Unity project that consumes capture data and provides Unity compatible geometry data for interaction with GameObjects and Components.
