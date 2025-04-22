@@ -50,10 +50,19 @@ function setup() {
     video.size(canvasWidth, canvasHeight);
     video.hide();
 
-    handPose.detectStart(video, gotHands);
+    handPose.detectStart(video, detectCallback);
 }
 
-function gotHands(results) {
+function startDetect() {
+    console.log("Preloading..");
+    preload();
+    setTimeout(() => {
+        console.log("Detecting..");
+        setup();
+    }, 2000);
+}
+
+function detectCallback(results) {
     hands = results;
 }
 
