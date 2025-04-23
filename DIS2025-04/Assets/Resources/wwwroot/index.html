@@ -1,0 +1,20 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HandPup</title>
+    <!-- Ref: https://docs.ml5js.org/#/reference/handpose -->
+    <script src="https://unpkg.com/ml5@1/dist/ml5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.1/p5.js"></script>
+</head>
+
+<body>
+    <div>
+    </div>
+    <button onclick="startDetect();">Restart</button>
+    <button onclick="coutOnce = true; cout = true;">Log once</button>
+    <button onclick="storeFrames = storeFrames + 1;">Store Frame</button>
+    <script src="handpose.js"></script>
+</body>
+</html>
