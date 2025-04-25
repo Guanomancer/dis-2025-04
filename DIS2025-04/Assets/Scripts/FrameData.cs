@@ -42,7 +42,15 @@ public class HandTrackingData
                 }
                 continue;
             }
-            Keypoint current = new Keypoint();
+            string keypointName = property.Name.ToString();
+
+
+            if (!Keypoints.ContainsKey(keypointName))
+            {
+                Keypoints.Add(keypointName, new Keypoint());
+            }
+
+            Keypoint current = Keypoints[keypointName];
 
             current.screenPosition.x = property.Value["x"].ToObject<float>();
             current.screenPosition.y = property.Value["y"].ToObject<float>();
@@ -50,8 +58,6 @@ public class HandTrackingData
             current.worldPosition.y = property.Value["y3D"].ToObject<float>();
             current.worldPosition.z = property.Value["z3D"].ToObject<float>();
             current.keypointName = property.Name.ToString();
-
-            Keypoints.Add(current.keypointName, current);
 
         }
 
