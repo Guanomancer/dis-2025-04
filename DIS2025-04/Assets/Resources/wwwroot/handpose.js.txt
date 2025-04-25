@@ -95,7 +95,7 @@ function draw() {
     }
 
     if (hands.length > 0 && storeFrames != 0) {
-        const url = "https://localhost:7002/api/Store/" + deviceId + "/" + frameIdx++;
+        const url = "http://localhost:8080/api/Store/" + deviceId + "/" + frameIdx++;
         if (cout) console.log("Storing at: " + url + "\n" + hands);
         storeFrames = Math.max(storeFrames - 1, -1);
         apiPost(url, hands);

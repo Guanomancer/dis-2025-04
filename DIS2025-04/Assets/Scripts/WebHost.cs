@@ -9,7 +9,7 @@ using UnityEngine.Playables;
 
 public class NewMonoBehaviourScript : MonoBehaviour
 {
-    private const long HTTP_POST_BUFFER_SIZE = 10240;
+    private const int HTTP_POST_BUFFER_SIZE = 10240;
 
     [SerializeField] string _url = "http://localhost:8080/";
     [SerializeField] WebPageMapping[] _webPages;
@@ -73,13 +73,14 @@ public class NewMonoBehaviourScript : MonoBehaviour
 
     private void GetContextCallback(IAsyncResult result)
     {
+        _listener.BeginGetContext(GetContextCallback, null);
+
         var context = _listener.EndGetContext(result);
         var path = context.Request.Url.LocalPath;
 
+        Debug.Log($"HTTP Context path: {path}");
         if (path.StartsWith("/api/")) RouteApiRequest(context, path);
         else ProcessWebRequest(context, path);
-
-        _listener.BeginGetContext(GetContextCallback, null);
     }
 
     private void ProcessWebRequest(HttpListenerContext context, string url)
@@ -126,12 +127,11 @@ public class NewMonoBehaviourScript : MonoBehaviour
         {
             var postData = string.Empty;
             var inStream = context.Request.InputStream;
-            if (inStream != null && inStream.Length < HTTP_POST_BUFFER_SIZE)
+            if (inStream != null && inStream.CanRead)
             {
-                int len = (int)inStream.Length;
-                var inBuffer = new byte[len];
-                inStream.Read(inBuffer, 0, len);
-                postData = Encoding.UTF8.GetString(inBuffer);
+                var inBuffer = new byte[HTTP_POST_BUFFER_SIZE];
+                var bytesRead = inStream.Read(inBuffer, 0, HTTP_POST_BUFFER_SIZE);
+                postData = Encoding.UTF8.GetString(inBuffer, 0, bytesRead);
             }
             string[] query;
             if (pathParts.Length < 4)
@@ -141,7 +141,7 @@ public class NewMonoBehaviourScript : MonoBehaviour
             else
             {
                 query = new string[pathParts.Length - 3 + 1];
-                Array.Copy(pathParts, 3, query, 1, query.Length);
+                Array.Copy(pathParts, 3, query, 1, query.Length - 1);
             }
             query[0] = postData;
             json = _apiEndpoints[endPointName].Invoke(query);
