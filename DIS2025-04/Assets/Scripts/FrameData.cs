@@ -10,8 +10,6 @@ public class HandTrackingData
     public float Confidence { get; set; }
 
     public Dictionary<string, Keypoint> Keypoints; // Vector2
-    public Dictionary<string, Keypoint3D> Keypoints3D; // Vector3
-    public Dictionary<string, Point3D> Points3D;
 
     public static HandTrackingData DeserializeJSON(string json)
     {
@@ -30,38 +28,10 @@ public class HandTrackingData
         // Parse keypoint data
         handTrackingData.Keypoints = new Dictionary<string, Keypoint>();
 
-        foreach (JObject keypoint in keypoints)
-        {
-            Keypoint current = new Keypoint();
-
-            current.X = keypoint["x"].ToObject<double>();
-            current.Y = keypoint["y"].ToObject<double>();
-            current.Name = keypoint["name"].ToString();
-
-            handTrackingData.Keypoints.Add(current.Name, current);
-        }
-
         innerData.Remove("keypoints");
-
-        // Parse keypoint3d data
-        handTrackingData.Keypoints3D = new Dictionary<string, Keypoint3D>();
-
-        foreach (JObject keypoint3D in keypoints3D)
-        {
-            Keypoint3D current = new Keypoint3D();
-
-            current.X = keypoint3D["x"].ToObject<double>();
-            current.Y = keypoint3D["y"].ToObject<double>();
-            current.Z = keypoint3D["z"].ToObject<double>();
-            current.Name = keypoint3D["name"].ToString();
-
-            handTrackingData.Keypoints3D.Add(current.Name, current);
-        }
-
         innerData.Remove("keypoints3D");
 
         // Parse non-JArray data
-        handTrackingData.Points3D = new Dictionary<string, Point3D>();
         foreach (var property in innerData.Properties())
         {
             if (property.Value.Type != JTokenType.Object)
@@ -76,16 +46,16 @@ public class HandTrackingData
                 }
                 continue;
             }
-            Point3D current = new Point3D();
+            Keypoint current = new Keypoint();
 
-            current.X = property.Value["x"].ToObject<double>();
-            current.Y = property.Value["y"].ToObject<double>();
-            current.X3D = property.Value["x3D"].ToObject<double>();
-            current.Y3D = property.Value["y3D"].ToObject<double>();
-            current.Z3D = property.Value["z3D"].ToObject<double>();
-            current.Name = property.Name.ToString();
+            current.screenPosition.x = property.Value["x"].ToObject<float>();
+            current.screenPosition.y = property.Value["y"].ToObject<float>();
+            current.worldPosition.x = property.Value["x3D"].ToObject<float>();
+            current.worldPosition.y = property.Value["y3D"].ToObject<float>();
+            current.worldPosition.z = property.Value["z3D"].ToObject<float>();
+            current.keypointName = property.Name.ToString();
 
-            handTrackingData.Points3D.Add(current.Name, current);
+            handTrackingData.Keypoints.Add(current.keypointName, current);
 
         }
 
@@ -104,20 +74,6 @@ public class HandTrackingData
         {
             foreach (var kp in Keypoints)
                 sb.AppendLine($"  {kp.Key}: {kp.Value}");
-        }
-
-        sb.AppendLine("Keypoints3D:");
-        if (Keypoints3D != null)
-        {
-            foreach (var kp in Keypoints3D)
-                sb.AppendLine($"  {kp.Key}: {kp.Value}");
-        }
-
-        sb.AppendLine("Points3D:");
-        if (Points3D != null)
-        {
-            foreach (var pt in Points3D)
-                sb.AppendLine($"  {pt.Key}: {pt.Value}");
         }
 
         return sb.ToString();
