@@ -9,8 +9,8 @@ public class HandTrackingData
     public string Handedness { get; set; }
     public float Confidence { get; set; }
 
-    public Dictionary<string, Keypoint> Keypoints;
-    public Dictionary<string, Keypoint3D> Keypoints3D;
+    public Dictionary<string, Keypoint> Keypoints; // Vector2
+    public Dictionary<string, Keypoint3D> Keypoints3D; // Vector3
     public Dictionary<string, Point3D> Points3D;
 
     public static HandTrackingData DeserializeJSON(string json)
@@ -124,7 +124,7 @@ public class HandTrackingData
     }
 
 }
-
+// Array of scriptable objects
 public class FrameData : MonoBehaviour
 {
     void Start()
