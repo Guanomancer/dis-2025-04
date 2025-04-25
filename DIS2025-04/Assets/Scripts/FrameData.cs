@@ -9,8 +9,7 @@ public class HandTrackingData
     public string Handedness { get; set; }
     public float Confidence { get; set; }
 
-    public Dictionary<string, Keypoint> Keypoints; // Vector2
-
+    public Dictionary<string, Keypoint> Keypoints;
     public static HandTrackingData DeserializeJSON(string json)
     {
         HandTrackingData handTrackingData = new HandTrackingData();
