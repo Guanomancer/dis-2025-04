@@ -14,13 +14,13 @@ public class HandTrackingData
     {
         // Parse outer data
         JObject outer = JObject.Parse(json);
-        DeviceID = outer["deviceId"].ToString();
-        FrameIndex = outer["frameIndex"].ToObject<int>();
+        DeviceID = outer["DeviceId"].ToObject<string>();
+        FrameIndex = outer["FrameIndex"].ToObject<int>();
 
         // Parse inner data
-        JObject innerData = (JObject)JArray.Parse(outer["frameData"].ToString())[0];
-        JArray keypoints = (JArray)innerData["keypoints"];
-        JArray keypoints3D = (JArray)innerData["keypoints3D"];
+        JObject innerData = (JObject)JArray.Parse(outer["FrameDataJson"].ToString())[0];
+        JArray keypoints = (JArray)innerData["Keypoints"];
+        JArray keypoints3D = (JArray)innerData["Keypoints3D"];
 
         // Parse keypoint data
 

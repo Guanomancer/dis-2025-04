@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Playables;
 
-public class NewMonoBehaviourScript : MonoBehaviour
+public class HttpHost : MonoBehaviour
 {
     private const int HTTP_POST_BUFFER_SIZE = 10240;
 
@@ -20,6 +20,8 @@ public class NewMonoBehaviourScript : MonoBehaviour
     private Dictionary<string, Func<string[], string>> _apiEndpoints;
 
     private Queue<FrameDataEntry> _frameBuffer;
+
+    public string RetrieveFrame() => API_Retrieve(null);
 
     private void Start()
     {
@@ -78,7 +80,7 @@ public class NewMonoBehaviourScript : MonoBehaviour
         var context = _listener.EndGetContext(result);
         var path = context.Request.Url.LocalPath;
 
-        Debug.Log($"HTTP Context path: {path}");
+        //Debug.Log($"HTTP Context path: {path}");
         if (path.StartsWith("/api/")) RouteApiRequest(context, path);
         else ProcessWebRequest(context, path);
     }
@@ -92,13 +94,13 @@ public class NewMonoBehaviourScript : MonoBehaviour
         {
             html = _pages[url];
             context.Response.StatusCode = 200;
-            Debug.Log($"Serving page {url}");
+            //Debug.Log($"Serving page {url}");
         }
         else
         {
             html = "Page not found!<br/>" + url;
             context.Response.StatusCode = 404;
-            Debug.Log($"Serving 404 for page {url}");
+            //Debug.Log($"Serving 404 for page {url}");
         }
 
         var buffer = System.Text.Encoding.UTF8.GetBytes(html);
@@ -121,7 +123,7 @@ public class NewMonoBehaviourScript : MonoBehaviour
         {
             json = "";
             context.Response.StatusCode = 404;
-            Debug.Log($"Serving 400 for API /{endPointName}");
+            //Debug.Log($"Serving 400 for API /{endPointName}");
         }
         else
         {
@@ -149,10 +151,10 @@ public class NewMonoBehaviourScript : MonoBehaviour
             {
                 context.Response.StatusCode = 404;
                 json = string.Empty;
-                Debug.Log($"Serving 400 for API /{endPointName}");
+                //Debug.Log($"Serving 400 for API /{endPointName}");
             }
             context.Response.StatusCode = 200;
-            Debug.Log($"Serving API /{endPointName}");
+            //Debug.Log($"Serving API /{endPointName}");
         }
 
         var buffer = Encoding.UTF8.GetBytes(json);
@@ -173,7 +175,7 @@ public class NewMonoBehaviourScript : MonoBehaviour
         
         var frameData = query[0];
         _frameBuffer.Enqueue(new(deviceId.ToString(), frameIndex, frameData));
-        Debug.Log($"Stored frame #{frameIndex} for device {{{deviceId}}} with => {frameData}");
+        //Debug.Log($"Stored frame #{frameIndex} for device {{{deviceId}}} with => {frameData}");
 
         return "OK";
     }
@@ -183,7 +185,7 @@ public class NewMonoBehaviourScript : MonoBehaviour
         if (!_frameBuffer.TryDequeue(out var frame)) return null;
 
         var json = JsonUtility.ToJson(frame);
-        Debug.Log($"Retrieved frame #{frame.FrameIndex} with {json}");
+        //Debug.Log($"Retrieved frame #{frame.FrameIndex} with {json}");
 
         return json;
     }
