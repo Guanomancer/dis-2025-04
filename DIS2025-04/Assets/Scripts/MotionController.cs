@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class MotionController : MonoBehaviour
 {
@@ -18,6 +19,7 @@ public class MotionController : MonoBehaviour
     [Header("Keypoints")]
     [SerializeField] private KeypointBinding[] _keypointBindings;
 
+    Vector3 maxR = Vector3.zero;
     private void Update()
     {
         foreach (var binding in _keypointBindings)
@@ -39,35 +41,41 @@ public class MotionController : MonoBehaviour
                 var cameraPos = screenPosN *
                     new Vector2(Camera.main.scaledPixelWidth, Camera.main.scaledPixelHeight);
 
-                var rotation = new Vector3(
-                    screenPos.x,
-                    screenPos.y,
-                    binding.Transform.position.z
-                    ).Swizzle(_swizzle);
-
+                var positionWS = Vector3.zero;
                 var ray = Camera.main.ScreenPointToRay(cameraPos);
                 if (Physics.Raycast(
                     ray,
                     out RaycastHit hit))
                 {
                     Debug.Log($"Hit: {hit.collider.name}");
-                    rotation = hit.point;
+                    positionWS = hit.point;
                 }
                 else
                 {
-                    rotation = ray.GetPoint(20f);
+                    positionWS = ray.GetPoint(20f);
                 }
-                Debug.Log(cameraPos);
                 Debug.DrawRay(ray.origin, ray.direction, Color.blue);
 
-                binding.Transform.position = rotation;
+                binding.Transform.position = positionWS;
             }
 
             if (_applyRotation)
             {
-                binding.Transform.eulerAngles = binding.Keypoint.worldPosition * _rotationScale;
+                // yaw, pitch, roll
+                var rotation = binding.Keypoint.worldPosition * 360 * _rotationScale;
+
+                if (binding.Keypoint.keypointName == "index_finger_tip")
+                {
+                    Debug.Log($"Rotation (Estimated Euler): {rotation}, Model prediction: <b>{binding.Keypoint.worldPosition}</b>");
+                }
+
+                if (binding.Keypoint.keypointName == "wrist")
+                {
+                    binding.Transform.localEulerAngles = rotation;
+                }
             }
         }
+        //Debug.Log(maxR);
     }
 }
 
