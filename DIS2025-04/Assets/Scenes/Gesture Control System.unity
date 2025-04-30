@@ -622,6 +622,7 @@ MonoBehaviour:
   _flipY: 1
   _applyRotation: 1
   _rotationScale: 2
+  _pointerKeypointBindingIndex: 0
   _keypointBindings:
   - Keypoint: {fileID: 11400000, guid: 941c26b2b6e0a36448e102844d7cf1fe, type: 2}
     Transform: {fileID: 2115540484}
@@ -1122,6 +1123,7 @@ MonoBehaviour:
   _flipY: 1
   _applyRotation: 0
   _rotationScale: 2
+  _pointerKeypointBindingIndex: 8
   _keypointBindings:
   - Keypoint: {fileID: 11400000, guid: 941c26b2b6e0a36448e102844d7cf1fe, type: 2}
     Transform: {fileID: 2115540484}

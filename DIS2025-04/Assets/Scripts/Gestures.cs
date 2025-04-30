@@ -2,10 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.XR;
 
 public class Gestures : MonoBehaviour
 {
+    [SerializeField] private UnityEvent<GameObject> _onHoverChanged;
+    [SerializeField] private UnityEvent<GameObject> _onSelectionChanged;
+
     [Header("Capture Settings")]
     [Tooltip("If you are running the HTTP capture host remotely, you can disable this.")]
     [SerializeField] private bool _runHttpHost;
@@ -23,7 +27,8 @@ public class Gestures : MonoBehaviour
     private HttpHost _httpHost;
     private HandTrackingData _deserializer;
 
-
+    public GameObject CurrentHover { get; private set; }
+    public GameObject CurrentSelected { get; private set; }
 
     static Gestures _instance;
 
@@ -104,7 +109,36 @@ public class Gestures : MonoBehaviour
             var frame = _httpHost.RetrieveFrame();
             if (frame == null) return;
             _deserializer.DeserializeJSON(frame);
+
+            var hit = _motionController.CurrentRaycastHit;
+            if (hit.collider != null && CurrentHover == null)
+            {
+                Debug.Log($"Start hover {hit.transform.name}");
+                OnHoverChanged(hit.transform.gameObject);
+            }
+            else if (hit.collider == null && CurrentHover != null)
+            {
+                Debug.Log($"End hover {CurrentHover}");
+                OnHoverChanged(null);
+            }
+            else if (hit.collider != null && CurrentHover != hit.transform.gameObject)
+            {
+                Debug.Log($"Change hover {CurrentHover} to {hit.transform.name}");
+                OnHoverChanged(hit.transform.gameObject);
+            }
         }
+    }
+
+    protected virtual void OnHoverChanged(GameObject newHover)
+    {
+        _onHoverChanged?.Invoke(newHover);
+        CurrentHover = newHover;
+    }
+    
+    protected virtual void OnSelectionChanged(GameObject newSelection)
+    {
+        _onSelectionChanged?.Invoke(newSelection);
+        CurrentSelected = newSelection;
     }
 
     private void SpawnAndBindDots(KeypointBinding[] keypointBindings)

@@ -18,7 +18,9 @@ public class MotionController : MonoBehaviour
     [SerializeField] private float _rotationScale = 2f;
 
     [Header("Keypoints")]
+    [SerializeField] private int _pointerKeypointBindingIndex;
     [SerializeField] private KeypointBinding[] _keypointBindings;
+
     public KeypointBinding[] KeypointBindings => _keypointBindings;
 
     private Vector2 _currentPositionSS;
@@ -30,12 +32,19 @@ public class MotionController : MonoBehaviour
     private Vector3 _currentRotaton;
     public Vector3 CurrentRotation => _currentRotaton;
 
+    public RaycastHit CurrentRaycastHit {  get; private set; }
+
     private void Update()
     {
-        foreach (var binding in _keypointBindings)
+        CurrentRaycastHit = default;
+        for (int i = 0; i < _keypointBindings.Length; i++)
         {
+            var binding = _keypointBindings[i];
             if (binding.Keypoint == null) return;
             if (binding.Transform == null) return;
+
+            // yaw, pitch, roll
+            var rotation = binding.Keypoint.worldPosition * 360 * _rotationScale;
 
             var cameraPos = GetCameraPosition(binding);
             GetScreenPosition(cameraPos, out var screenPosN, out var screenPos);
@@ -46,7 +55,6 @@ public class MotionController : MonoBehaviour
                 ray,
                 out RaycastHit hit))
             {
-                //Debug.Log($"Hit: {hit.collider.name}");
                 positionWS = hit.point;
             }
             else
@@ -54,25 +62,30 @@ public class MotionController : MonoBehaviour
                 positionWS = ray.GetPoint(20f);
             }
 
-            _currentPositionSS = screenPos;
-            _currentPositionWS = positionWS;
-            if (_applyPosition)
+            if (i == _pointerKeypointBindingIndex)
             {
-                binding.Transform.position =
-                    binding.Transform.TryGetComponent<CanvasRenderer>(out _) ?
+                if (_applyPosition && binding.Transform.TryGetComponent<CanvasRenderer>(out _))
+                {
+                    binding.Transform.position = screenPos;
+                }
+
+                if (_applyRotation)
+                {
+                    binding.Transform.localEulerAngles = rotation;
+                }
+
+                _currentPositionWS = positionWS;
+                _currentPositionSS = screenPos;
+                _currentRotaton = rotation;
+
+                CurrentRaycastHit = hit;
+            }
+            else if(_applyPosition)
+            {
+                binding.Transform.position = binding.Transform.TryGetComponent<CanvasRenderer>(out _) ?
                     screenPos : positionWS;
             }
-
-            // yaw, pitch, roll
-            var rotation = binding.Keypoint.worldPosition * 360 * _rotationScale;
-
-            _currentRotaton = rotation;
-            if (_applyRotation)
-            {
-                binding.Transform.localEulerAngles = rotation;
-            }
         }
-        //Debug.Log(maxR);
     }
 
     public Vector2 GetCameraPosition(KeypointBinding binding) => new Vector2(
