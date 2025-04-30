@@ -8,14 +8,14 @@ public class StreamHandler : MonoBehaviour
     [SerializeField] private HttpHost _httpHost;
     [SerializeField] private Keypoint[] _keypoints;
 
-    private HandTrackingData tracker;
+    private HandTrackingData _tracker;
 
     private void Awake()
     {
-        tracker = new();
+        _tracker = new();
         foreach (var keypoint in _keypoints)
         {
-            tracker.Keypoints.Add(keypoint.keypointName, keypoint);
+            _tracker.Keypoints.Add(keypoint.keypointName, keypoint);
         }
     }
 
@@ -24,11 +24,11 @@ public class StreamHandler : MonoBehaviour
         if (_httpHost != null)
         {
             var frame = _httpHost.RetrieveFrame();
-            if (frame != null) tracker.DeserializeJSON(frame);
+            if (frame != null) _tracker.DeserializeJSON(frame);
             return;
         }
 
-        tracker.DeserializeJSON(exampleJson);
+        _tracker.DeserializeJSON(exampleJson);
     }
 
     [ContextMenu("Print Keypoint names:")]
