@@ -19,10 +19,13 @@ public class MotionController : MonoBehaviour
 
     [Header("Keypoints")]
     [SerializeField] private KeypointBinding[] _keypointBindings;
-    public IReadOnlyList<KeypointBinding> KeypointBindings => _keypointBindings;
+    public KeypointBinding[] KeypointBindings => _keypointBindings;
 
     private Vector2 _currentPositionSS;
     public Vector2 CurrentPositionScreenspace => _currentPositionSS;
+
+    private Vector2 _currentPositionWS;
+    public Vector2 CurrentPositionWorldspace => _currentPositionWS;
 
     private Vector3 _currentRotaton;
     public Vector3 CurrentRotation => _currentRotaton;
@@ -34,42 +37,39 @@ public class MotionController : MonoBehaviour
             if (binding.Keypoint == null) return;
             if (binding.Transform == null) return;
 
-            if (binding.Keypoint.keypointName == "wrist")
+            var cameraPos = GetCameraPosition(binding);
+            GetScreenPosition(cameraPos, out var screenPosN, out var screenPos);
+
+            var positionWS = Vector3.zero;
+            var ray = Camera.main.ScreenPointToRay(screenPos);
+            if (Physics.Raycast(
+                ray,
+                out RaycastHit hit))
             {
-                var cameraPos = GetCameraPosition(binding);
-                GetScreenPosition(cameraPos, out var screenPosN, out var screenPos);
+                //Debug.Log($"Hit: {hit.collider.name}");
+                positionWS = hit.point;
+            }
+            else
+            {
+                positionWS = ray.GetPoint(20f);
+            }
 
-                var positionWS = Vector3.zero;
-                var ray = Camera.main.ScreenPointToRay(screenPos);
-                if (Physics.Raycast(
-                    ray,
-                    out RaycastHit hit))
-                {
-                    Debug.Log($"Hit: {hit.collider.name}");
-                    positionWS = hit.point;
-                }
-                else
-                {
-                    positionWS = ray.GetPoint(20f);
-                }
-
-                _currentPositionSS = positionWS;
-                if (_applyPosition)
-                {
-                    binding.Transform.position = positionWS;
-                }
+            _currentPositionSS = screenPos;
+            _currentPositionWS = positionWS;
+            if (_applyPosition)
+            {
+                binding.Transform.position =
+                    binding.Transform.TryGetComponent<CanvasRenderer>(out _) ?
+                    screenPos : positionWS;
             }
 
             // yaw, pitch, roll
             var rotation = binding.Keypoint.worldPosition * 360 * _rotationScale;
 
-            if (binding.Keypoint.keypointName == "wrist")
+            _currentRotaton = rotation;
+            if (_applyRotation)
             {
-                _currentPositionSS = rotation;
-                if (_applyRotation)
-                {
-                    binding.Transform.localEulerAngles = rotation;
-                }
+                binding.Transform.localEulerAngles = rotation;
             }
         }
         //Debug.Log(maxR);
@@ -80,7 +80,7 @@ public class MotionController : MonoBehaviour
             _flipY ? _cameraResolution.y - binding.Keypoint.screenPosition.y : binding.Keypoint.screenPosition.y
         );
 
-    private void GetScreenPosition(Vector2 cameraPosition, out Vector3 screenPosN, out Vector3 screenPos)
+    public void GetScreenPosition(Vector2 cameraPosition, out Vector3 screenPosN, out Vector3 screenPos)
     {
         screenPosN = new Vector2(
             cameraPosition.x / _cameraResolution.x,

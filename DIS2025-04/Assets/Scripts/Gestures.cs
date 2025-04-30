@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.Security.Cryptography;
 using UnityEngine;
+using UnityEngine.XR;
 
 public class Gestures : MonoBehaviour
 {
@@ -13,19 +16,25 @@ public class Gestures : MonoBehaviour
 
     [Header("Motion Settings")]
     [SerializeField] private MotionController _motionController;
-
+    [SerializeField] private bool _debugDrawHands;
+    [SerializeField] private Canvas _debugCanvas;
+    [SerializeField] private GameObject _debugDotTemplate;
+    
     private HttpHost _httpHost;
     private HandTrackingData _deserializer;
 
-    private static Gestures _instance;
+
+
+    static Gestures _instance;
 
     private void Awake()
     {
         if (!InitializeSingleton()) return;
         InitializeHttpHost();
         InitializeDeserializer();
+        InitializeDebugDots();
 
-        
+
 
         bool InitializeSingleton()
         {
@@ -37,14 +46,13 @@ public class Gestures : MonoBehaviour
             }
 
             _instance = this;
-            DontDestroyOnLoad(gameObject);
             return true;
         }
 
         bool InitializeHttpHost()
         {
             if (!_runHttpHost) return false;
-            if(string.IsNullOrEmpty(_httpHostEndpoint))
+            if (string.IsNullOrEmpty(_httpHostEndpoint))
             {
                 Debug.LogError("HTTP Host endpoint is not set.", this);
                 return false;
@@ -71,6 +79,22 @@ public class Gestures : MonoBehaviour
 
             return true;
         }
+
+        bool InitializeDebugDots()
+        {
+            if (_debugCanvas == null)
+            {
+                Debug.LogError("Debug canvas is not assigned.", this);
+                return false;
+            }
+            if (_motionController == null)
+            {
+                Debug.LogError("MotionController is not assigned.", this);
+                return false;
+            }
+            SpawnAndBindDots(_motionController.KeypointBindings);
+            return true;
+        }
     }
 
     private void Update()
@@ -83,13 +107,43 @@ public class Gestures : MonoBehaviour
         }
     }
 
+    private void SpawnAndBindDots(KeypointBinding[] keypointBindings)
+    {
+        int len = keypointBindings.Length;
+        for (int i = 0; i < len; i++)
+        {
+            var keypoint = keypointBindings[i];
+            var go = Instantiate(_debugDotTemplate, _debugCanvas.transform);
+            go.name = keypoint.Keypoint.keypointName;
+            keypoint.Transform = go.transform;
+            keypointBindings[i] = keypoint;
+            go.GetComponent<UnityEngine.UI.Image>().color = GetColorFromKeypointIndex(i);
+            go.SetActive(true);
+        }
+    }
+
+    private Color GetColorFromKeypointIndex(int keypointIndex)
+    {
+        if (keypointIndex == 0)
+        {
+            return new(0, 0, 0);
+        }
+        int digit = 1 + Mathf.FloorToInt((keypointIndex - 1) / 4);
+        int index = 1 + (keypointIndex - 1) % 4;
+        var saturation = Mathf.FloorToInt(255 * index / 4);
+        var r = ((digit & 1) != 0) ? saturation : 0;
+        var g = ((digit & 2) != 0) ? saturation : 0;
+        var b = ((digit & 4) != 0) ? saturation : 0;
+        return new(r, g, b, .5f);
+    }
+
     public void WaitGesture(object gesture, Action action)
     {
         throw new NotImplementedException("WaitGesture is not implemented yet.");
     }
 
     public Vector2 GetCurrentPositionScreenspace() =>
-        _motionController.CurrentPositionScreenspace;
+        _motionController.CurrentPositionWorldspace;
 
     public Vector2 GetCurrentPositionScreenspace(Keypoint keypoint)
     {
@@ -101,8 +155,8 @@ public class Gestures : MonoBehaviour
     public Vector3 GetCurrentPositionScreenspace(Camera camera)
     {
         Debug.Assert(camera != null, "Camera is null", this);
-    
-        return _motionController.CurrentPositionScreenspace;
+
+        return _motionController.CurrentPositionWorldspace;
     }
 
     public Vector3 GetCurrentPositionScreenspace(Camera camera, Keypoint keypoint)
@@ -110,7 +164,7 @@ public class Gestures : MonoBehaviour
         Debug.Assert(camera != null, "Camera is null", this);
         Debug.Assert(keypoint != null, "Keypoint is null", this);
 
-        return _motionController.CurrentPositionScreenspace;
+        return _motionController.CurrentPositionWorldspace;
     }
 
     //event GestureChanged(NewGesture)
