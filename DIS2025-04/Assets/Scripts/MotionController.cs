@@ -1,10 +1,11 @@
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class MotionController : MonoBehaviour
 {
     [SerializeField]
     private Vector2 _cameraResolution = new Vector2(800, 600);
+    public Vector2 CameraResolution => _cameraResolution;
 
     [Header("Position")]
     [SerializeField] private bool _applyPosition;
@@ -13,75 +14,106 @@ public class MotionController : MonoBehaviour
 
     [Header("Rotation")]
     [SerializeField] private bool _applyRotation;
-    [SerializeField] private SwizzleOrder _swizzle = SwizzleOrder.XYZ;
-    [SerializeField] private float _rotationScale = 1000.0f;
+    //[SerializeField] private SwizzleOrder _swizzle = SwizzleOrder.XYZ;
+    [SerializeField] private float _rotationScale = 2f;
 
     [Header("Keypoints")]
+    [SerializeField] private int _pointerKeypointBindingIndex;
     [SerializeField] private KeypointBinding[] _keypointBindings;
 
-    Vector3 maxR = Vector3.zero;
+    public KeypointBinding[] KeypointBindings => _keypointBindings;
+
+    private Vector2 _currentPositionSS;
+    public Vector2 CurrentPositionScreenspace => _currentPositionSS;
+
+    private Vector2 _currentPositionWS;
+    public Vector2 CurrentPositionWorldspace => _currentPositionWS;
+
+    private Vector3 _currentRotaton;
+    public Vector3 CurrentRotation => _currentRotaton;
+
+    public RaycastHit CurrentRaycastHit {  get; private set; }
+
     private void Update()
     {
-        foreach (var binding in _keypointBindings)
+        CurrentRaycastHit = default;
+        for (int i = 0; i < _keypointBindings.Length; i++)
         {
-            if ((binding.Keypoint.keypointName == "thumb_tip" || binding.Keypoint.keypointName == "index_finger_tip") && _applyPosition)
-            {
-                Debug.Log(binding.Keypoint.ToString());
-            }
-
-
+            var binding = _keypointBindings[i];
             if (binding.Keypoint == null) return;
             if (binding.Transform == null) return;
 
-            //if (ApplyPosition)
-            if (binding.Keypoint.keypointName == "wrist" && _applyPosition)
+            // yaw, pitch, roll
+            var rotation = binding.Keypoint.rotation * 360 * _rotationScale;
+
+            var cameraPos = GetCameraPosition(binding);
+            GetScreenPosition(cameraPos, out var screenPosN, out var screenPos);
+
+            var positionWS = Vector3.zero;
+            var ray = Camera.main.ScreenPointToRay(screenPos);
+            if (Physics.Raycast(
+                ray,
+                out RaycastHit hit))
             {
-                var screenPos = new Vector2(
-                    _flipX ? _cameraResolution.x - binding.Keypoint.screenPosition.x : binding.Keypoint.screenPosition.x,
-                    _flipY ? _cameraResolution.y - binding.Keypoint.screenPosition.y : binding.Keypoint.screenPosition.y
-                    );
-                var screenPosN = new Vector2(
-                    screenPos.x / _cameraResolution.x,
-                    screenPos.y / _cameraResolution.y
-                    );
-                var cameraPos = screenPosN *
-                    new Vector2(Camera.main.scaledPixelWidth, Camera.main.scaledPixelHeight);
-
-                var positionWS = Vector3.zero;
-                var ray = Camera.main.ScreenPointToRay(cameraPos);
-                if (Physics.Raycast(
-                    ray,
-                    out RaycastHit hit))
-                {
-                    Debug.Log($"Hit: {hit.collider.name}");
-                    positionWS = hit.point;
-                }
-                else
-                {
-                    positionWS = ray.GetPoint(20f);
-                }
-                Debug.DrawRay(ray.origin, ray.direction, Color.blue);
-
-                binding.Transform.position = positionWS;
+                positionWS = hit.point;
+            }
+            else
+            {
+                positionWS = ray.GetPoint(20f);
             }
 
-            if (_applyRotation)
+            if (i == _pointerKeypointBindingIndex)
             {
-                // yaw, pitch, roll
-                var rotation = binding.Keypoint.rotation * 360 * _rotationScale;
-
-                if (binding.Keypoint.keypointName == "index_finger_tip")
+                if (_applyPosition && binding.Transform.TryGetComponent<CanvasRenderer>(out _))
                 {
-                    Debug.Log($"Rotation (Estimated Euler): {rotation}, Model prediction: <b>{binding.Keypoint.rotation}</b>");
+                    binding.Transform.position = screenPos;
                 }
 
-                if (binding.Keypoint.keypointName == "wrist")
+                if (_applyRotation)
                 {
                     binding.Transform.localEulerAngles = rotation;
                 }
+
+                _currentPositionWS = positionWS;
+                _currentPositionSS = screenPos;
+                _currentRotaton = rotation;
+
+                CurrentRaycastHit = hit;
+            }
+            else if(_applyPosition)
+            {
+                binding.Transform.position = binding.Transform.TryGetComponent<CanvasRenderer>(out _) ?
+                    screenPos : positionWS;
             }
         }
-        //Debug.Log(maxR);
+    }
+
+    public Vector2 GetCameraPosition(KeypointBinding binding) => new Vector2(
+            _flipX ? _cameraResolution.x - binding.Keypoint.screenPosition.x : binding.Keypoint.screenPosition.x,
+            _flipY ? _cameraResolution.y - binding.Keypoint.screenPosition.y : binding.Keypoint.screenPosition.y
+        );
+
+    public void GetScreenPosition(Vector2 cameraPosition, out Vector3 screenPosN, out Vector3 screenPos)
+    {
+        screenPosN = new Vector2(
+            cameraPosition.x / _cameraResolution.x,
+            cameraPosition.y / _cameraResolution.y
+        );
+        screenPos = screenPosN *
+            new Vector2(Camera.main.scaledPixelWidth, Camera.main.scaledPixelHeight);
+    }
+
+    public Vector2 GetCurrentPositionScreenspace(Keypoint keypoint)
+    {
+        if (keypoint == null) return Vector2.zero;
+        foreach (var binding in _keypointBindings)
+        {
+            if (binding.Keypoint == keypoint)
+            {
+                return binding.Keypoint.screenPosition;
+            }
+        }
+        return Vector2.zero;
     }
 }
 

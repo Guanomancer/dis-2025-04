@@ -1,18 +1,15 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using UnityEngine;
-using UnityEngine.Networking;
-using UnityEngine.Playables;
 
-public class HttpHost : MonoBehaviour
+public class HttpHost
 {
     private const int HTTP_POST_BUFFER_SIZE = 10240;
 
-    [SerializeField] string _url = "http://localhost:8080/";
-    [SerializeField] WebPageMapping[] _webPages;
+    private string _url = "http://localhost:8080/";
+    private WebPageMapping[] _webPages;
 
     private HttpListener _listener;
 
@@ -23,8 +20,11 @@ public class HttpHost : MonoBehaviour
 
     public string RetrieveFrame() => API_Retrieve(null);
 
-    private void Start()
+    public HttpHost(string endpoint, WebPageMapping[] pageMappings)
     {
+        _url = endpoint;
+        _webPages = pageMappings;
+
         _pages = new();
         foreach (var page in _webPages)
         {
@@ -42,36 +42,33 @@ public class HttpHost : MonoBehaviour
         _listener.Prefixes.Add(_url);
         _listener.Start();
         _listener.BeginGetContext(GetContextCallback, null);
-
-        StartCoroutine(Fetch(_url));
-        StartCoroutine(Fetch(_url + "api/Device"));
     }
 
-    private IEnumerator Fetch(string url)
-    {
-        yield return null;
-        using (var webRequest = UnityWebRequest.Get(url))
-        {
-            yield return webRequest.SendWebRequest();
+    //private IEnumerator Fetch(string url)
+    //{
+    //    yield return null;
+    //    using (var webRequest = UnityWebRequest.Get(url))
+    //    {
+    //        yield return webRequest.SendWebRequest();
 
-            switch (webRequest.result)
-            {
-                case UnityWebRequest.Result.ConnectionError:
-                case UnityWebRequest.Result.DataProcessingError:
-                    var error = $"Error: {webRequest.error}";
-                    Debug.LogError(error, this);
-                    break;
-                case UnityWebRequest.Result.ProtocolError:
-                    var httpError = $"HTTP Error: {webRequest.error}";
-                    Debug.LogError(httpError, this);
-                    break;
-                case UnityWebRequest.Result.Success:
-                    var result = webRequest.downloadHandler.text;
-                    Debug.Log(result, this);
-                    break;
-            }
-        }
-    }
+    //        switch (webRequest.result)
+    //        {
+    //            case UnityWebRequest.Result.ConnectionError:
+    //            case UnityWebRequest.Result.DataProcessingError:
+    //                var error = $"Error: {webRequest.error}";
+    //                Debug.LogError(error, this);
+    //                break;
+    //            case UnityWebRequest.Result.ProtocolError:
+    //                var httpError = $"HTTP Error: {webRequest.error}";
+    //                Debug.LogError(httpError, this);
+    //                break;
+    //            case UnityWebRequest.Result.Success:
+    //                var result = webRequest.downloadHandler.text;
+    //                Debug.Log(result, this);
+    //                break;
+    //        }
+    //    }
+    //}
 
     private void GetContextCallback(IAsyncResult result)
     {
@@ -172,7 +169,7 @@ public class HttpHost : MonoBehaviour
     {
         if (!Guid.TryParse(query[1], out Guid deviceId)) return null;
         if (!int.TryParse(query[2], out int frameIndex)) return null;
-        
+
         var frameData = query[0];
         _frameBuffer.Enqueue(new(deviceId.ToString(), frameIndex, frameData));
         //Debug.Log($"Stored frame #{frameIndex} for device {{{deviceId}}} with => {frameData}");
