@@ -1,10 +1,9 @@
-using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 
 // Array of scriptable objects
-public class FrameData : MonoBehaviour
+public class HandTrackingController : MonoBehaviour
 {
     void Start()
     {
