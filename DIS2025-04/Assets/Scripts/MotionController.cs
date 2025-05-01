@@ -44,7 +44,7 @@ public class MotionController : MonoBehaviour
             if (binding.Transform == null) return;
 
             // yaw, pitch, roll
-            var rotation = binding.Keypoint.worldPosition * 360 * _rotationScale;
+            var rotation = binding.Keypoint.rotation * 360 * _rotationScale;
 
             var cameraPos = GetCameraPosition(binding);
             GetScreenPosition(cameraPos, out var screenPosN, out var screenPos);
