@@ -54,9 +54,9 @@ public class HandTrackingData
 
             current.screenPosition.x = property.Value["x"].ToObject<float>();
             current.screenPosition.y = property.Value["y"].ToObject<float>();
-            current.worldPosition.x = property.Value["x3D"].ToObject<float>();
-            current.worldPosition.y = property.Value["y3D"].ToObject<float>();
-            current.worldPosition.z = property.Value["z3D"].ToObject<float>();
+            current.rotation.x = property.Value["x3D"].ToObject<float>();
+            current.rotation.y = property.Value["y3D"].ToObject<float>();
+            current.rotation.z = property.Value["z3D"].ToObject<float>();
             current.keypointName = property.Name.ToString();
 
         }
