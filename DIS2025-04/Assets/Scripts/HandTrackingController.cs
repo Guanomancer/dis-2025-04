@@ -3,14 +3,19 @@ using UnityEngine.Events;
 
 public class HandTrackingController : MonoBehaviour
 {
-    public UnityEvent OnGestureDetected;     // Gesture Detected
-    public UnityEvent OnGestureEnded;         // Gesture Ended
+    [Tooltip("Gesture Detected")]
+    public UnityEvent OnGestureDetected;     
+    [Tooltip("Gesture Ended")]
+    public UnityEvent OnGestureEnded;        
 
     private HandTrackingData handTrackingData = new HandTrackingData();
 
-    public float pinchThreshold = 10f;         // Distance threshold for pinch detection
-    public float detectionHoldTime = 0.2f;     // 200ms to trigger
-    public float lostHoldTime = 0.2f;           // 200ms to de-trigger
+    [Tooltip("Distance threshold for pinch detection")]
+    public float pinchThreshold = 10f;
+    [Tooltip("200ms to trigger")]
+    public float detectionHoldTime = 0.2f;
+    [Tooltip("200ms to de-trigger")]
+    public float lostHoldTime = 0.2f;           
 
     private bool gestureActive = false;         // Whether gesture is currently active
     private float gestureTimer = 0f;             // Timer to track detection time
