@@ -24,6 +24,12 @@ public class MotionController : MonoBehaviour
     {
         foreach (var binding in _keypointBindings)
         {
+            if ((binding.Keypoint.keypointName == "thumb_tip" || binding.Keypoint.keypointName == "index_finger_tip") && _applyPosition)
+            {
+                Debug.Log(binding.Keypoint.ToString());
+            }
+
+
             if (binding.Keypoint == null) return;
             if (binding.Transform == null) return;
 

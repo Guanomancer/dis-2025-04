@@ -6,6 +6,7 @@ public class HandTrackingController : MonoBehaviour
     public UnityEvent OnGestureDetected; // Event to fire when a gesture is detected
 
     private HandTrackingData handTrackingData = new HandTrackingData();
+    public float pinchThreshold = 10f; // Initial Guess regarding Pinch
 
     private void Update()
     {
@@ -27,12 +28,12 @@ public class HandTrackingController : MonoBehaviour
         if (handTrackingData.Keypoints.Count == 0)
             return false;
 
-        // Example: simple "fist" detection based on distance between thumb and index finger
-        if (handTrackingData.Keypoints.TryGetValue("ThumbTip", out var thumb) &&
-            handTrackingData.Keypoints.TryGetValue("IndexTip", out var index))
+        // Pinch detection
+        if (handTrackingData.Keypoints.TryGetValue("thumb_tip", out var thumb) &&
+            handTrackingData.Keypoints.TryGetValue("index_finger_tip", out var index))
         {
             float distance = Vector2.Distance(thumb.screenPosition, index.screenPosition);
-            return distance < 0.05f; // Tune this threshold based on your app
+            return distance < pinchThreshold; // Tune this threshold based on your app
         }
 
         return false;
