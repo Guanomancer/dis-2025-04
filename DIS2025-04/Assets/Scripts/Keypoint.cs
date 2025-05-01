@@ -11,6 +11,9 @@ public class Keypoint : ScriptableObject
     public Vector2 screenPosition;    // e.g., 2D screen/UI space
     public Vector3 worldPosition;     // e.g., 3D Unity world or local space
 
+    [Header("Parent Keypoint")]
+    public Keypoint parent;
+
     public Vector2 ToVector2() => screenPosition;
 
     public static implicit operator Vector2(Keypoint k) => k.screenPosition;
