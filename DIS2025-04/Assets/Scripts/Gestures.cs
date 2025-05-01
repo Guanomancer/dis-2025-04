@@ -1,9 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Security.Cryptography;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Events;
-using UnityEngine.XR;
+using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class Gestures : MonoBehaviour
 {
@@ -23,14 +23,24 @@ public class Gestures : MonoBehaviour
     [SerializeField] private bool _debugDrawHands;
     [SerializeField] private Canvas _debugCanvas;
     [SerializeField] private GameObject _debugDotTemplate;
-    
+
     private HttpHost _httpHost;
-    private HandTrackingData _deserializer;
+    private HandTrackingData _handTracker;
 
-    public GameObject CurrentHover { get; private set; }
-    public GameObject CurrentSelected { get; private set; }
+    private Button _currentUiHover;
+    private GameObject _currentHover;
+    private GameObject _currentSelected;
+    private PointerEventData _pointerEventData;
+    private List<RaycastResult> _raycastResults;
 
+    #region Static fields
     static Gestures _instance;
+
+    public static HandTrackingData HandTracking => _instance != null ? _instance._handTracker : null;
+
+    public static GameObject CurrentHover => _instance != null ? _instance._currentHover : null;
+    public static GameObject CurrentSelected => _instance != null ? _instance._currentSelected : null;
+    #endregion
 
     private void Awake()
     {
@@ -38,8 +48,8 @@ public class Gestures : MonoBehaviour
         InitializeHttpHost();
         InitializeDeserializer();
         InitializeDebugDots();
-
-
+        _pointerEventData = new(EventSystem.current);
+        _raycastResults = new();
 
         bool InitializeSingleton()
         {
@@ -76,10 +86,10 @@ public class Gestures : MonoBehaviour
                 return false;
             }
 
-            _deserializer = new();
+            _handTracker = new();
             foreach (var keypoint in _motionController.KeypointBindings)
             {
-                _deserializer.Keypoints.Add(keypoint.Keypoint.keypointName, keypoint.Keypoint);
+                _handTracker.Keypoints.Add(keypoint.Keypoint.keypointName, keypoint.Keypoint);
             }
 
             return true;
@@ -104,41 +114,75 @@ public class Gestures : MonoBehaviour
 
     private void Update()
     {
-        if (_httpHost != null && _deserializer != null)
+        _pointerEventData.position = GetCurrentPositionScreenspace();
+
+        EventSystem.current.RaycastAll(_pointerEventData, _raycastResults);
+        var currentHit = _pointerEventData.pointerCurrentRaycast = FindFirstRaycast(_raycastResults);
+        _raycastResults.Clear();
+        if (currentHit.isValid)
+        {
+            var button = currentHit.gameObject.GetComponentInParent<Button>();
+            if (button != null && button != _currentUiHover)
+            {
+                if (button != null) button.OnPointerExit(_pointerEventData);
+                button.OnPointerEnter(_pointerEventData);
+                _currentUiHover = button;
+            }
+        }
+        else if (_currentUiHover != null)
+        {
+            _currentUiHover.OnPointerExit(_pointerEventData);
+            _currentUiHover = null;
+        }
+
+        if (_httpHost != null && _handTracker != null)
         {
             var frame = _httpHost.RetrieveFrame();
-            if (frame == null) return;
-            _deserializer.DeserializeJSON(frame);
+            if (string.IsNullOrEmpty(frame)) return;
+            _handTracker.DeserializeJSON(frame);
 
             var hit = _motionController.CurrentRaycastHit;
-            if (hit.collider != null && CurrentHover == null)
+            if (hit.collider != null && _currentHover == null)
             {
                 Debug.Log($"Start hover {hit.transform.name}");
                 OnHoverChanged(hit.transform.gameObject);
             }
-            else if (hit.collider == null && CurrentHover != null)
+            else if (hit.collider == null && _currentHover != null)
             {
-                Debug.Log($"End hover {CurrentHover}");
+                Debug.Log($"End hover {_currentHover}");
                 OnHoverChanged(null);
             }
-            else if (hit.collider != null && CurrentHover != hit.transform.gameObject)
+            else if (hit.collider != null && _currentHover != hit.transform.gameObject)
             {
-                Debug.Log($"Change hover {CurrentHover} to {hit.transform.name}");
+                Debug.Log($"Change hover {_currentHover} to {hit.transform.name}");
                 OnHoverChanged(hit.transform.gameObject);
             }
+        }
+
+        RaycastResult FindFirstRaycast(List<RaycastResult> candidates)
+        {
+            var candidatesCount = candidates.Count;
+            for (var i = 0; i < candidatesCount; ++i)
+            {
+                if (candidates[i].gameObject == null)
+                    continue;
+
+                return candidates[i];
+            }
+            return new RaycastResult();
         }
     }
 
     protected virtual void OnHoverChanged(GameObject newHover)
     {
         _onHoverChanged?.Invoke(newHover);
-        CurrentHover = newHover;
+        _currentHover = newHover;
     }
-    
+
     protected virtual void OnSelectionChanged(GameObject newSelection)
     {
         _onSelectionChanged?.Invoke(newSelection);
-        CurrentSelected = newSelection;
+        _currentSelected = newSelection;
     }
 
     private void SpawnAndBindDots(KeypointBinding[] keypointBindings)
@@ -171,34 +215,39 @@ public class Gestures : MonoBehaviour
         return new(r, g, b, .5f);
     }
 
-    public void WaitGesture(object gesture, Action action)
+    public static void WaitGesture(object gesture, Action action)
     {
         throw new NotImplementedException("WaitGesture is not implemented yet.");
     }
 
-    public Vector2 GetCurrentPositionScreenspace() =>
-        _motionController.CurrentPositionWorldspace;
+    public static Vector2 GetCurrentPositionScreenspace() =>
+        _instance != null ? _instance._motionController.CurrentPositionScreenspace : default;
 
-    public Vector2 GetCurrentPositionScreenspace(Keypoint keypoint)
+    public static Vector2 GetCurrentPositionScreenspace(Keypoint keypoint)
     {
-        Debug.Assert(keypoint != null, "Keypoint is null", this);
+        if (_instance == null) return default;
 
-        return _motionController.GetCurrentPositionScreenspace(keypoint);
+        Debug.Assert(keypoint != null, "Keypoint is null", _instance);
+        return _instance._motionController.GetCurrentPositionScreenspace(keypoint);
     }
 
-    public Vector3 GetCurrentPositionScreenspace(Camera camera)
+    public static Vector3 GetCurrentPositionScreenspace(Camera camera)
     {
-        Debug.Assert(camera != null, "Camera is null", this);
+        if (_instance == null) return default;
 
-        return _motionController.CurrentPositionWorldspace;
+        Debug.Assert(camera != null, "Camera is null", _instance);
+
+        return _instance._motionController.CurrentPositionWorldspace;
     }
 
     public Vector3 GetCurrentPositionScreenspace(Camera camera, Keypoint keypoint)
     {
+        if (_instance == null) return default;
+
         Debug.Assert(camera != null, "Camera is null", this);
         Debug.Assert(keypoint != null, "Keypoint is null", this);
 
-        return _motionController.CurrentPositionWorldspace;
+        return _instance._motionController.CurrentPositionWorldspace;
     }
 
     //event GestureChanged(NewGesture)
