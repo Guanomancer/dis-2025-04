@@ -62,11 +62,11 @@ public class MotionController : MonoBehaviour
             if (_applyRotation)
             {
                 // yaw, pitch, roll
-                var rotation = binding.Keypoint.worldPosition * 360 * _rotationScale;
+                var rotation = binding.Keypoint.rotation * 360 * _rotationScale;
 
                 if (binding.Keypoint.keypointName == "index_finger_tip")
                 {
-                    Debug.Log($"Rotation (Estimated Euler): {rotation}, Model prediction: <b>{binding.Keypoint.worldPosition}</b>");
+                    Debug.Log($"Rotation (Estimated Euler): {rotation}, Model prediction: <b>{binding.Keypoint.rotation}</b>");
                 }
 
                 if (binding.Keypoint.keypointName == "wrist")
