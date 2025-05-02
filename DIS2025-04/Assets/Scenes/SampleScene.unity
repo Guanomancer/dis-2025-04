@@ -784,56 +784,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bc91c499b311e14297f92b04cd01806, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cameraResolution: {x: 800, y: 600}
+  <CameraResolution>k__BackingField: {x: 800, y: 600}
   _applyPosition: 1
   _flipX: 1
   _flipY: 1
+  _defaultWorldspaceDepth: 15
   _applyRotation: 0
   _rotationScale: 2
   _pointerKeypointBindingIndex: 8
-  _keypointBindings:
-  - Keypoint: {fileID: 11400000, guid: 941c26b2b6e0a36448e102844d7cf1fe, type: 2}
-    Transform: {fileID: 0}
-  - Keypoint: {fileID: 11400000, guid: 4fe9941c59dc1f14f934ab379eaf87c1, type: 2}
-    Transform: {fileID: 0}
-  - Keypoint: {fileID: 11400000, guid: 395cadcf681a87a46846621e40ad2699, type: 2}
-    Transform: {fileID: 0}
-  - Keypoint: {fileID: 11400000, guid: f2758b0d38577b24ab7ff5c6b98a3a22, type: 2}
-    Transform: {fileID: 0}
-  - Keypoint: {fileID: 11400000, guid: b8fdcd79d0554ac41a285072e00fa52d, type: 2}
-    Transform: {fileID: 0}
-  - Keypoint: {fileID: 11400000, guid: 184c2b23555cb154fac9d2933bf3aa88, type: 2}
-    Transform: {fileID: 0}
-  - Keypoint: {fileID: 11400000, guid: e1f178aedc9696649a808f1946aae0ca, type: 2}
-    Transform: {fileID: 0}
-  - Keypoint: {fileID: 11400000, guid: 438173a71e3580145a688165b087166a, type: 2}
-    Transform: {fileID: 0}
-  - Keypoint: {fileID: 11400000, guid: e718f821a08429545befdadfac0a2032, type: 2}
-    Transform: {fileID: 0}
-  - Keypoint: {fileID: 11400000, guid: 5fa23fce9c8f4d941b0d08c253eeb9bd, type: 2}
-    Transform: {fileID: 0}
-  - Keypoint: {fileID: 11400000, guid: f0e36add94ea0a54e9d30453465f3b29, type: 2}
-    Transform: {fileID: 0}
-  - Keypoint: {fileID: 11400000, guid: 4737a8b3db6ca124c82bbccc84fcf305, type: 2}
-    Transform: {fileID: 0}
-  - Keypoint: {fileID: 11400000, guid: 6de85e1edf36eac49b3ebf7d637b436e, type: 2}
-    Transform: {fileID: 0}
-  - Keypoint: {fileID: 11400000, guid: 1e6e1ed6b76c2e84485bd9b641aa77fe, type: 2}
-    Transform: {fileID: 0}
-  - Keypoint: {fileID: 11400000, guid: 94e416a7b0951304c9bf79b842587455, type: 2}
-    Transform: {fileID: 0}
-  - Keypoint: {fileID: 11400000, guid: b8cd5daf07563d14488476297c87fa77, type: 2}
-    Transform: {fileID: 0}
-  - Keypoint: {fileID: 11400000, guid: 079f3a6570fba2044b1d99fd02ad271f, type: 2}
-    Transform: {fileID: 0}
-  - Keypoint: {fileID: 11400000, guid: 5f601084762ba6d4c89b210ba89e23c8, type: 2}
-    Transform: {fileID: 0}
-  - Keypoint: {fileID: 11400000, guid: 133a4cd9cea21544a8bd3b239da3a520, type: 2}
-    Transform: {fileID: 0}
-  - Keypoint: {fileID: 11400000, guid: 5bc19015321cf1846938397bab57b876, type: 2}
-    Transform: {fileID: 0}
-  - Keypoint: {fileID: 11400000, guid: 14797a9a8d7e92242bdababa441e1784, type: 2}
-    Transform: {fileID: 0}
+  <KeypointBindings>k__BackingField: []
+  <GenerateKeypointBindingsFrom>k__BackingField:
+  - {fileID: 11400000, guid: 941c26b2b6e0a36448e102844d7cf1fe, type: 2}
+  - {fileID: 11400000, guid: 4fe9941c59dc1f14f934ab379eaf87c1, type: 2}
+  - {fileID: 11400000, guid: 395cadcf681a87a46846621e40ad2699, type: 2}
+  - {fileID: 11400000, guid: f2758b0d38577b24ab7ff5c6b98a3a22, type: 2}
+  - {fileID: 11400000, guid: b8fdcd79d0554ac41a285072e00fa52d, type: 2}
+  - {fileID: 11400000, guid: 184c2b23555cb154fac9d2933bf3aa88, type: 2}
+  - {fileID: 11400000, guid: e1f178aedc9696649a808f1946aae0ca, type: 2}
+  - {fileID: 11400000, guid: 438173a71e3580145a688165b087166a, type: 2}
+  - {fileID: 11400000, guid: e718f821a08429545befdadfac0a2032, type: 2}
+  - {fileID: 11400000, guid: 5fa23fce9c8f4d941b0d08c253eeb9bd, type: 2}
+  - {fileID: 11400000, guid: f0e36add94ea0a54e9d30453465f3b29, type: 2}
+  - {fileID: 11400000, guid: 4737a8b3db6ca124c82bbccc84fcf305, type: 2}
+  - {fileID: 11400000, guid: 6de85e1edf36eac49b3ebf7d637b436e, type: 2}
+  - {fileID: 11400000, guid: 1e6e1ed6b76c2e84485bd9b641aa77fe, type: 2}
+  - {fileID: 11400000, guid: 94e416a7b0951304c9bf79b842587455, type: 2}
+  - {fileID: 11400000, guid: b8cd5daf07563d14488476297c87fa77, type: 2}
+  - {fileID: 11400000, guid: 079f3a6570fba2044b1d99fd02ad271f, type: 2}
+  - {fileID: 11400000, guid: 5f601084762ba6d4c89b210ba89e23c8, type: 2}
+  - {fileID: 11400000, guid: 133a4cd9cea21544a8bd3b239da3a520, type: 2}
+  - {fileID: 11400000, guid: 5bc19015321cf1846938397bab57b876, type: 2}
+  - {fileID: 11400000, guid: 14797a9a8d7e92242bdababa441e1784, type: 2}
 --- !u!224 &354846360
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2569,11 +2550,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 862e9620489a449fa93f4227560b5e5a, type: 3}
---- !u!4 &1954557066 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 7304663547092721581, guid: 862e9620489a449fa93f4227560b5e5a, type: 3}
-  m_PrefabInstance: {fileID: 1954557065}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1954912597
 GameObject:
   m_ObjectHideFlags: 0
@@ -2603,7 +2579,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1954557066}
+  - {fileID: 7304663546362917668}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2006664852
@@ -2911,6 +2887,11 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 7304663547092721581, guid: 862e9620489a449fa93f4227560b5e5a, type: 3}
   m_PrefabInstance: {fileID: 4700281316937807288}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &7304663546362917668 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7304663547092721581, guid: 862e9620489a449fa93f4227560b5e5a, type: 3}
+  m_PrefabInstance: {fileID: 1954557065}
   m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

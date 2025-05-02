@@ -34,10 +34,8 @@ public class Gestures : MonoBehaviour
     private List<RaycastResult> _raycastResults;
 
     #region Static fields
-    static Gestures _instance;
-
+    private static Gestures _instance;
     public static HandTrackingData HandTracking => _instance != null ? _instance._handTracker : null;
-
     public static GameObject CurrentHover => _instance != null ? _instance._currentHover : null;
     public static GameObject CurrentSelected => _instance != null ? _instance._currentSelected : null;
     #endregion
@@ -107,6 +105,7 @@ public class Gestures : MonoBehaviour
                 Debug.LogError("MotionController is not assigned.", this);
                 return false;
             }
+
             SpawnAndBindDots(_motionController.KeypointBindings);
             return true;
         }
@@ -116,30 +115,23 @@ public class Gestures : MonoBehaviour
     {
         _pointerEventData.position = GetCurrentPositionScreenspace();
 
-        EventSystem.current.RaycastAll(_pointerEventData, _raycastResults);
-        var currentHit = _pointerEventData.pointerCurrentRaycast = FindFirstRaycast(_raycastResults);
-        _raycastResults.Clear();
-        if (currentHit.isValid)
+        if (!UpdateHandTracker()) return;
+        UpdatePointerStateWorld();
+        UpdatePointerStateUI();
+
+        bool UpdateHandTracker()
         {
-            var button = currentHit.gameObject.GetComponentInParent<Button>();
-            if (button != null && button != _currentUiHover)
-            {
-                if (button != null) button.OnPointerExit(_pointerEventData);
-                button.OnPointerEnter(_pointerEventData);
-                _currentUiHover = button;
-            }
-        }
-        else if (_currentUiHover != null)
-        {
-            _currentUiHover.OnPointerExit(_pointerEventData);
-            _currentUiHover = null;
+            if (_httpHost == null || _handTracker == null) return false;
+
+            var frame = _httpHost.RetrieveFrame();
+            if (string.IsNullOrEmpty(frame)) return false;
+
+            _handTracker.DeserializeJSON(frame);
+            return true;
         }
 
-        if (_httpHost != null && _handTracker != null)
+        bool UpdatePointerStateWorld()
         {
-            var frame = _httpHost.RetrieveFrame();
-            if (string.IsNullOrEmpty(frame)) return;
-            _handTracker.DeserializeJSON(frame);
 
             var hit = _motionController.CurrentRaycastHit;
             if (hit.collider != null && _currentHover == null)
@@ -157,6 +149,29 @@ public class Gestures : MonoBehaviour
                 Debug.Log($"Change hover {_currentHover} to {hit.transform.name}");
                 OnHoverChanged(hit.transform.gameObject);
             }
+            return true;
+        }
+
+        void UpdatePointerStateUI()
+        {
+            EventSystem.current.RaycastAll(_pointerEventData, _raycastResults);
+            var currentHit = _pointerEventData.pointerCurrentRaycast = FindFirstRaycast(_raycastResults);
+            _raycastResults.Clear();
+            if (currentHit.isValid)
+            {
+                var button = currentHit.gameObject.GetComponentInParent<Button>();
+                if (button != null && button != _currentUiHover)
+                {
+                    if (button != null) button.OnPointerExit(_pointerEventData);
+                    button.OnPointerEnter(_pointerEventData);
+                    _currentUiHover = button;
+                }
+            }
+            else if (_currentUiHover != null)
+            {
+                _currentUiHover.OnPointerExit(_pointerEventData);
+                _currentUiHover = null;
+            }
         }
 
         RaycastResult FindFirstRaycast(List<RaycastResult> candidates)
@@ -169,7 +184,7 @@ public class Gestures : MonoBehaviour
 
                 return candidates[i];
             }
-            return new RaycastResult();
+            return default;
         }
     }
 
@@ -200,15 +215,16 @@ public class Gestures : MonoBehaviour
         }
     }
 
-    private Color GetColorFromKeypointIndex(int keypointIndex)
+    public static Color GetColorFromKeypointIndex(int keypointIndex)
     {
-        if (keypointIndex == 0)
-        {
-            return new(0, 0, 0);
-        }
-        int digit = 1 + Mathf.FloorToInt((keypointIndex - 1) / 4);
-        int index = 1 + (keypointIndex - 1) % 4;
-        var saturation = Mathf.FloorToInt(255 * index / 4);
+        const int KEYPOINTS_PER_FINGER = 4;
+        const int FINGERS_PER_HAND = 5;
+
+        if (keypointIndex == 0) return new(0, 0, 0);
+
+        int digit = 1 + Mathf.FloorToInt((keypointIndex - 1) / (FINGERS_PER_HAND - 1));
+        int index = 1 + (keypointIndex - 1) % (FINGERS_PER_HAND - 1);
+        var saturation = Mathf.FloorToInt(255 * index / KEYPOINTS_PER_FINGER);
         var r = ((digit & 1) != 0) ? saturation : 0;
         var g = ((digit & 2) != 0) ? saturation : 0;
         var b = ((digit & 4) != 0) ? saturation : 0;
@@ -220,8 +236,13 @@ public class Gestures : MonoBehaviour
         throw new NotImplementedException("WaitGesture is not implemented yet.");
     }
 
+    public static bool GetObjectUnder(Keypoint keypoint, out RaycastHit hit)
+    {
+        throw new NotImplementedException();
+    }
+
     public static Vector2 GetCurrentPositionScreenspace() =>
-        _instance != null ? _instance._motionController.CurrentPositionScreenspace : default;
+        _instance != null ? _instance._motionController.CurrentPositionSS : default;
 
     public static Vector2 GetCurrentPositionScreenspace(Keypoint keypoint)
     {
@@ -237,21 +258,20 @@ public class Gestures : MonoBehaviour
 
         Debug.Assert(camera != null, "Camera is null", _instance);
 
-        return _instance._motionController.CurrentPositionWorldspace;
+        return _instance._motionController.CurrentPositionWS;
     }
 
-    public Vector3 GetCurrentPositionScreenspace(Camera camera, Keypoint keypoint)
+    public static Vector3 GetCurrentPositionScreenspace(Camera camera, Keypoint keypoint)
     {
         if (_instance == null) return default;
 
-        Debug.Assert(camera != null, "Camera is null", this);
-        Debug.Assert(keypoint != null, "Keypoint is null", this);
+        Debug.Assert(camera != null, "Camera is null", _instance);
+        Debug.Assert(keypoint != null, "Keypoint is null", _instance);
 
-        return _instance._motionController.CurrentPositionWorldspace;
+        return _instance._motionController.CurrentPositionWS;
     }
 
     //event GestureChanged(NewGesture)
     //event OnGesture(Gesture)
     //event OnSelectionChanged(NewSelection, OldSelection)
-    //bool GetObjectUnder(Keypoint, out RaycastHit)
 }

@@ -1,66 +1,74 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class MotionController : MonoBehaviour
 {
-    [SerializeField]
-    private Vector2 _cameraResolution = new Vector2(800, 600);
-    public Vector2 CameraResolution => _cameraResolution;
+    [field: SerializeField] public Vector2 CameraResolution { get; private set; } = new Vector2(800, 600);
 
     [Header("Position")]
     [SerializeField] private bool _applyPosition;
     [SerializeField] private bool _flipX;
     [SerializeField] private bool _flipY = true;
+    [Tooltip("Default Z value for CurrentPositionWS, when the keypoint is not over a gameobject.")]
+    [SerializeField] private float _defaultWorldspaceDepth = 15f;
 
-    [Header("Rotation")]
+    [Header("Rotation (Not Implemented, yet)")]
     [SerializeField] private bool _applyRotation;
-    //[SerializeField] private SwizzleOrder _swizzle = SwizzleOrder.XYZ;
     [SerializeField] private float _rotationScale = 2f;
 
     [Header("Keypoints")]
     [SerializeField] private int _pointerKeypointBindingIndex;
-    [SerializeField] private KeypointBinding[] _keypointBindings;
+    [Tooltip("You can assign these manually or leave blank to have them auto generated for debug dots usage.")]
+    [field: SerializeField] public KeypointBinding[] KeypointBindings { get; private set; }
+    [field: SerializeField] public Keypoint[] GenerateKeypointBindingsFrom { get; private set; }
 
-    public KeypointBinding[] KeypointBindings => _keypointBindings;
+    public Vector2 CurrentPositionSS { get; private set; }
+    public Vector2 CurrentPositionWS { get; private set; }
+    public Vector3 CurrentRotaton { get; private set; }
+    public RaycastHit CurrentRaycastHit { get; private set; }
 
-    private Vector2 _currentPositionSS;
-    public Vector2 CurrentPositionScreenspace => _currentPositionSS;
+    private void Awake()
+    {
+        GenerateKeypointBindings();
 
-    private Vector2 _currentPositionWS;
-    public Vector2 CurrentPositionWorldspace => _currentPositionWS;
 
-    private Vector3 _currentRotaton;
-    public Vector3 CurrentRotation => _currentRotaton;
 
-    public RaycastHit CurrentRaycastHit {  get; private set; }
+        bool GenerateKeypointBindings()
+        {
+            if (GenerateKeypointBindingsFrom == null) return false;
+
+            KeypointBindings = new KeypointBinding[GenerateKeypointBindingsFrom.Length];
+            for (int i = 0; i < GenerateKeypointBindingsFrom.Length; ++i)
+            {
+                KeypointBindings[i].Keypoint = GenerateKeypointBindingsFrom[i];
+            }
+
+            return true;
+        }
+    }
 
     private void Update()
     {
         CurrentRaycastHit = default;
-        for (int i = 0; i < _keypointBindings.Length; i++)
+        for (int i = 0; i < KeypointBindings.Length; i++)
         {
-            var binding = _keypointBindings[i];
-            if (binding.Keypoint == null) return;
-            if (binding.Transform == null) return;
+            var binding = KeypointBindings[i];
+            if (binding.Keypoint == null) continue;
+            if (binding.Transform == null) continue;
 
-            // yaw, pitch, roll
             var rotation = binding.Keypoint.rotation * 360 * _rotationScale;
+            if (_applyRotation && binding.Keypoint.keypointName == "wrist")
+            {
+                // yaw, pitch, roll
+                binding.Transform.localEulerAngles = rotation;
+            }
 
             var cameraPos = GetCameraPosition(binding);
             GetScreenPosition(cameraPos, out var screenPosN, out var screenPos);
 
-            var positionWS = Vector3.zero;
             var ray = Camera.main.ScreenPointToRay(screenPos);
-            if (Physics.Raycast(
-                ray,
-                out RaycastHit hit))
-            {
-                positionWS = hit.point;
-            }
-            else
-            {
-                positionWS = ray.GetPoint(20f);
-            }
+            var positionWS = Physics.Raycast(ray, out RaycastHit hit) ?
+                hit.point :
+                ray.GetPoint(_defaultWorldspaceDepth);
 
             if (i == _pointerKeypointBindingIndex)
             {
@@ -69,18 +77,13 @@ public class MotionController : MonoBehaviour
                     binding.Transform.position = screenPos;
                 }
 
-                if (_applyRotation)
-                {
-                    binding.Transform.localEulerAngles = rotation;
-                }
-
-                _currentPositionWS = positionWS;
-                _currentPositionSS = screenPos;
-                _currentRotaton = rotation;
+                CurrentPositionWS = positionWS;
+                CurrentPositionSS = screenPos;
+                CurrentRotaton = rotation;
 
                 CurrentRaycastHit = hit;
             }
-            else if(_applyPosition)
+            else if (_applyPosition)
             {
                 binding.Transform.position = binding.Transform.TryGetComponent<CanvasRenderer>(out _) ?
                     screenPos : positionWS;
@@ -89,15 +92,15 @@ public class MotionController : MonoBehaviour
     }
 
     public Vector2 GetCameraPosition(KeypointBinding binding) => new Vector2(
-            _flipX ? _cameraResolution.x - binding.Keypoint.screenPosition.x : binding.Keypoint.screenPosition.x,
-            _flipY ? _cameraResolution.y - binding.Keypoint.screenPosition.y : binding.Keypoint.screenPosition.y
+            _flipX ? CameraResolution.x - binding.Keypoint.screenPosition.x : binding.Keypoint.screenPosition.x,
+            _flipY ? CameraResolution.y - binding.Keypoint.screenPosition.y : binding.Keypoint.screenPosition.y
         );
 
     public void GetScreenPosition(Vector2 cameraPosition, out Vector3 screenPosN, out Vector3 screenPos)
     {
         screenPosN = new Vector2(
-            cameraPosition.x / _cameraResolution.x,
-            cameraPosition.y / _cameraResolution.y
+            cameraPosition.x / CameraResolution.x,
+            cameraPosition.y / CameraResolution.y
         );
         screenPos = screenPosN *
             new Vector2(Camera.main.scaledPixelWidth, Camera.main.scaledPixelHeight);
@@ -106,7 +109,7 @@ public class MotionController : MonoBehaviour
     public Vector2 GetCurrentPositionScreenspace(Keypoint keypoint)
     {
         if (keypoint == null) return Vector2.zero;
-        foreach (var binding in _keypointBindings)
+        foreach (var binding in KeypointBindings)
         {
             if (binding.Keypoint == keypoint)
             {
