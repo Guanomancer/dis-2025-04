@@ -703,7 +703,7 @@ GameObject:
   - component: {fileID: 354846357}
   - component: {fileID: 354846356}
   m_Layer: 5
-  m_Name: Debud Dots
+  m_Name: Debug Dots
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
