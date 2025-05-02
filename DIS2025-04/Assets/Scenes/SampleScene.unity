@@ -299,7 +299,8 @@ MonoBehaviour:
   - Delete
   - Scale
   - Rotate
-  radius: 100
+  - Close
+  radius: 150
 --- !u!1001 &249303909
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1849,6 +1850,9 @@ MonoBehaviour:
   _debugDrawHands: 1
   _debugCanvas: {fileID: 354846358}
   _debugDotTemplate: {fileID: 340456513}
+  _radialMenuController: {fileID: 164654749}
+  _handTrackingController: {fileID: 59167815}
+  _sendClickEventsToButtons: 1
 --- !u!4 &1131877482
 Transform:
   m_ObjectHideFlags: 0

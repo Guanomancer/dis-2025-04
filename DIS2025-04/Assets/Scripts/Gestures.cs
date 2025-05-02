@@ -24,6 +24,11 @@ public class Gestures : MonoBehaviour
     [SerializeField] private Canvas _debugCanvas;
     [SerializeField] private GameObject _debugDotTemplate;
 
+    [Header("Gesture Settings")]
+    [SerializeField] private RadialMenuController _radialMenuController;
+    [SerializeField] private HandTrackingController _handTrackingController;
+    [SerializeField] private bool _sendClickEventsToButtons;
+
     private HttpHost _httpHost;
     private HandTrackingData _handTracker;
 
@@ -32,12 +37,17 @@ public class Gestures : MonoBehaviour
     private GameObject _currentSelected;
     private PointerEventData _pointerEventData;
     private List<RaycastResult> _raycastResults;
+    private Ray _selectedObjectOffsetRay;
+    private float _selectedObjectOffsetZ;
+    private Vector3 _selectedObjectOffset;
 
     #region Static fields
     private static Gestures _instance;
     public static HandTrackingData HandTracking => _instance != null ? _instance._handTracker : null;
     public static GameObject CurrentHover => _instance != null ? _instance._currentHover : null;
     public static GameObject CurrentSelected => _instance != null ? _instance._currentSelected : null;
+    public static GestureTool CurrentTool { get; set; } = GestureTool.Translate;
+
     #endregion
 
     private void Awake()
@@ -46,9 +56,14 @@ public class Gestures : MonoBehaviour
         InitializeHttpHost();
         InitializeDeserializer();
         InitializeDebugDots();
+
         _pointerEventData = new(EventSystem.current);
         _raycastResults = new();
 
+        _handTrackingController.OnGestureDetected.AddListener(GestureDetected);
+        _handTrackingController.OnGestureEnded.AddListener(GestureEnded);
+
+        #region Local Methods
         bool InitializeSingleton()
         {
             if (_instance != null)
@@ -109,6 +124,14 @@ public class Gestures : MonoBehaviour
             SpawnAndBindDots(_motionController.KeypointBindings);
             return true;
         }
+        #endregion
+    }
+
+    private void OnDestroy()
+    {
+        if (_instance != this) return;
+
+        _instance = null;
     }
 
     private void Update()
@@ -119,6 +142,7 @@ public class Gestures : MonoBehaviour
         UpdatePointerStateWorld();
         UpdatePointerStateUI();
 
+        #region Local Methods
         bool UpdateHandTracker()
         {
             if (_httpHost == null || _handTracker == null) return false;
@@ -132,6 +156,21 @@ public class Gestures : MonoBehaviour
 
         bool UpdatePointerStateWorld()
         {
+            if (_currentSelected != null)
+            {
+                switch (CurrentTool)
+                {
+                    case GestureTool.Translate:
+
+                        var ray = Camera.main.ScreenPointToRay(_motionController.CurrentPositionSS);
+                        var offsetPos = _selectedObjectOffsetRay.GetPoint(_selectedObjectOffsetZ);
+                        var currentPos = ray.GetPoint(_selectedObjectOffsetZ);
+                        var deltaPos = currentPos - offsetPos;
+                        _currentSelected.transform.position = _selectedObjectOffset + deltaPos;
+                        break;
+                }
+                return true;
+            }
 
             var hit = _motionController.CurrentRaycastHit;
             if (hit.collider != null && _currentHover == null)
@@ -162,7 +201,7 @@ public class Gestures : MonoBehaviour
                 var button = currentHit.gameObject.GetComponentInParent<Button>();
                 if (button != null && button != _currentUiHover)
                 {
-                    if (button != null) button.OnPointerExit(_pointerEventData);
+                    if (_currentUiHover != null) _currentUiHover.OnPointerExit(_pointerEventData);
                     button.OnPointerEnter(_pointerEventData);
                     _currentUiHover = button;
                 }
@@ -186,6 +225,7 @@ public class Gestures : MonoBehaviour
             }
             return default;
         }
+        #endregion
     }
 
     protected virtual void OnHoverChanged(GameObject newHover)
@@ -198,6 +238,12 @@ public class Gestures : MonoBehaviour
     {
         _onSelectionChanged?.Invoke(newSelection);
         _currentSelected = newSelection;
+        if (_currentSelected != null)
+        {
+            _selectedObjectOffsetRay = Camera.main.ScreenPointToRay(_motionController.CurrentPositionSS);
+            _selectedObjectOffsetZ = _currentSelected.transform.position.z - Camera.main.transform.position.z;
+            _selectedObjectOffset = _currentHover.transform.position;
+        }
     }
 
     private void SpawnAndBindDots(KeypointBinding[] keypointBindings)
@@ -210,9 +256,60 @@ public class Gestures : MonoBehaviour
             go.name = keypoint.Keypoint.keypointName;
             keypoint.Transform = go.transform;
             keypointBindings[i] = keypoint;
-            go.GetComponent<UnityEngine.UI.Image>().color = GetColorFromKeypointIndex(i);
+            go.GetComponent<Image>().color = GetColorFromKeypointIndex(i);
             go.SetActive(true);
         }
+    }
+
+    private void GestureDetected()
+    {
+        if (PerformUiInteraction()) return;
+        if (PerformWorldInteraction()) return;
+        if (PerformMenuAccess()) return;
+
+        #region Local Methods
+        bool PerformUiInteraction()
+        {
+            if (_currentUiHover == null) return false;
+
+            _currentUiHover.OnPointerClick(_pointerEventData);
+            return true;
+        }
+
+        bool PerformWorldInteraction()
+        {
+            if (_currentHover == null) return false;
+
+            OnSelectionChanged(_currentHover);
+            return true;
+        }
+
+        bool PerformMenuAccess()
+        {
+            if (_radialMenuController == null) return false;
+
+            if (_radialMenuController.gameObject.activeInHierarchy) return false;
+
+            _radialMenuController.OpenMenu();
+
+            return true;
+        }
+        #endregion
+    }
+
+    private void GestureEnded()
+    {
+        if (PerformWorldInteraction()) return;
+
+        #region Local Methods
+        bool PerformWorldInteraction()
+        {
+            if (_currentSelected == null) return false;
+
+            OnSelectionChanged(null);
+            return true;
+        }
+        #endregion
     }
 
     public static Color GetColorFromKeypointIndex(int keypointIndex)
@@ -274,4 +371,15 @@ public class Gestures : MonoBehaviour
     //event GestureChanged(NewGesture)
     //event OnGesture(Gesture)
     //event OnSelectionChanged(NewSelection, OldSelection)
+}
+
+public enum GestureTool
+{
+    None = 0,
+
+    Translate,
+    Rotate,
+    Scale,
+
+    Flick,
 }

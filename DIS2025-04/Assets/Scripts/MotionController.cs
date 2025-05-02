@@ -22,6 +22,7 @@ public class MotionController : MonoBehaviour
     [field: SerializeField] public Keypoint[] GenerateKeypointBindingsFrom { get; private set; }
 
     public Vector2 CurrentPositionSS { get; private set; }
+    public Vector2 DeltaPositionSS { get; private set; }
     public Vector2 CurrentPositionWS { get; private set; }
     public Vector3 CurrentRotaton { get; private set; }
     public RaycastHit CurrentRaycastHit { get; private set; }
@@ -78,6 +79,7 @@ public class MotionController : MonoBehaviour
                 }
 
                 CurrentPositionWS = positionWS;
+                DeltaPositionSS = (Vector2)screenPos - CurrentPositionSS;
                 CurrentPositionSS = screenPos;
                 CurrentRotaton = rotation;
 
