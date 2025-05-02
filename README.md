@@ -2,7 +2,7 @@
 Colab project with DIS Study Abroad computer science students, April 2025
 
 ## Brief
-The Motion Control System is a basic framework, intended to demonstrate how to use cheap webcams and phone cameras to capture and identify geometric keypoints for hands, and applying them to GameObjects in Unity in real-time.
+This Motion Control System is a basic framework, intended to demonstrate how to use cheap webcams and phone cameras to capture and identify geometric keypoints for hands, and applying them to GameObjects in Unity in real-time.
 
 This is a two-part project utilizing ML.js to capture hand keypoint data from any web-enabled camera source and stream it to a backend, and a Unity based stream consumer, which applies the keypoint data to a visual representation and allows the user to manipulate scene objects in real time using hand gestures.
 
@@ -15,6 +15,11 @@ We have tried to make the project extensible, as this is only a demonstration. I
 - Ethan Kabatchnik, DIS computer science student, Systems Engineering for Unity plugin.
 - Sarah Than, DIS computer science student, UI and UX engineering for Unity plugin.
 - Troels Windekilde, Guanomancer ApS, Tech lead and Web development.
+
+## Getting started
+The Unity project has a Demo scene. When running it, hit the Launch Browser button.
+In the browser, grant camera access when prompted and press Restart.
+Wave your hand in front of your camera and follow the onscreen instructions.
 
 # Requirements For Contributers
 The following are required for contributors to set up locally.
