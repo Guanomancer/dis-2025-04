@@ -49,8 +49,7 @@ public class Gestures : MonoBehaviour
     public static HandTrackingData HandTracking => _instance != null ? _instance._handTracker : null;
     public static GameObject CurrentHover => _instance != null ? _instance._currentHover : null;
     public static GameObject CurrentSelected => _instance != null ? _instance._currentSelected : null;
-    public static GestureTool CurrentTool { get; set; } = GestureTool.Yeet;
-
+    public static GestureTool CurrentTool { get; set; } = GestureTool.Move;
     #endregion
 
     private void Awake()
@@ -168,7 +167,7 @@ public class Gestures : MonoBehaviour
                 var deltaPosWS = currentPos - offsetPos;
                 switch (CurrentTool)
                 {
-                    case GestureTool.Translate:
+                    case GestureTool.Move:
                         _currentSelected.transform.position = _selectedObjectOffset + deltaPosWS;
                         break;
                     case GestureTool.Rotate:
@@ -398,7 +397,7 @@ public enum GestureTool
 {
     None = 0,
 
-    Translate,
+    Move,
     Rotate,
     Scale,
 
