@@ -54,6 +54,9 @@ public class HandTrackingController : MonoBehaviour
 
     private bool DetectGesture()
     {
+
+        var handTrackingData = Gestures.HandTracking;
+
         if (handTrackingData.Keypoints.Count == 0)
             return false;
 
@@ -70,5 +73,15 @@ public class HandTrackingController : MonoBehaviour
     public void UpdateHandTrackingData(string json)
     {
         handTrackingData.DeserializeJSON(json);
+    }
+
+    public void LogGestureDetected()
+    {
+        Debug.Log("Pinch gesture detected!");
+    }
+
+    public void LogGestureEnded()
+    {
+        Debug.Log("Pinch gesture ended.");
     }
 }
