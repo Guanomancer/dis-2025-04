@@ -40,13 +40,16 @@ public class Gestures : MonoBehaviour
     private Ray _selectedObjectOffsetRay;
     private float _selectedObjectOffsetZ;
     private Vector3 _selectedObjectOffset;
+    private Vector3 _selectedObjectRotation;
+    private Vector3 _selectedObjectScale;
+    private Vector2 _selectedObjectOffsetSS;
 
     #region Static fields
     private static Gestures _instance;
     public static HandTrackingData HandTracking => _instance != null ? _instance._handTracker : null;
     public static GameObject CurrentHover => _instance != null ? _instance._currentHover : null;
     public static GameObject CurrentSelected => _instance != null ? _instance._currentSelected : null;
-    public static GestureTool CurrentTool { get; set; } = GestureTool.Translate;
+    public static GestureTool CurrentTool { get; set; } = GestureTool.Yeet;
 
     #endregion
 
@@ -158,15 +161,30 @@ public class Gestures : MonoBehaviour
         {
             if (_currentSelected != null)
             {
+                var deltaPosSS = _selectedObjectOffsetSS - _motionController.CurrentPositionSS;
+                var ray = Camera.main.ScreenPointToRay(_motionController.CurrentPositionSS);
+                var offsetPos = _selectedObjectOffsetRay.GetPoint(_selectedObjectOffsetZ);
+                var currentPos = ray.GetPoint(_selectedObjectOffsetZ);
+                var deltaPosWS = currentPos - offsetPos;
                 switch (CurrentTool)
                 {
                     case GestureTool.Translate:
-
-                        var ray = Camera.main.ScreenPointToRay(_motionController.CurrentPositionSS);
-                        var offsetPos = _selectedObjectOffsetRay.GetPoint(_selectedObjectOffsetZ);
-                        var currentPos = ray.GetPoint(_selectedObjectOffsetZ);
-                        var deltaPos = currentPos - offsetPos;
-                        _currentSelected.transform.position = _selectedObjectOffset + deltaPos;
+                        _currentSelected.transform.position = _selectedObjectOffset + deltaPosWS;
+                        break;
+                    case GestureTool.Rotate:
+                        _currentSelected.transform.eulerAngles = _selectedObjectRotation + new Vector3(deltaPosSS.y, deltaPosSS.x, 0f) * .1f;
+                        break;
+                    case GestureTool.Scale:
+                        _currentSelected.transform.localScale = _selectedObjectScale + new Vector3(deltaPosSS.x, deltaPosSS.y, 0f) * .1f;
+                        break;
+                    case GestureTool.Yeet:
+                        if (!_currentSelected.TryGetComponent<Rigidbody>(out var rigidbody))
+                        {
+                            rigidbody = _currentSelected.AddComponent<Rigidbody>();
+                            rigidbody.linearVelocity = UnityEngine.Random.insideUnitSphere * 100f;
+                        }
+                        break;
+                    default:
                         break;
                 }
                 return true;
@@ -240,9 +258,12 @@ public class Gestures : MonoBehaviour
         _currentSelected = newSelection;
         if (_currentSelected != null)
         {
+            _selectedObjectOffsetSS = _motionController.CurrentPositionSS;
             _selectedObjectOffsetRay = Camera.main.ScreenPointToRay(_motionController.CurrentPositionSS);
             _selectedObjectOffsetZ = _currentSelected.transform.position.z - Camera.main.transform.position.z;
             _selectedObjectOffset = _currentHover.transform.position;
+            _selectedObjectRotation = _currentHover.transform.eulerAngles;
+            _selectedObjectScale = _currentHover.transform.localScale;
         }
     }
 
@@ -381,5 +402,5 @@ public enum GestureTool
     Rotate,
     Scale,
 
-    Flick,
+    Yeet,
 }
