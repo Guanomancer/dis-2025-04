@@ -43,7 +43,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_AnchoredPosition.x
-    path: HandDots/Canvas/Thumb/Thumb1
+    path: Thumb1
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -73,7 +73,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_AnchoredPosition.y
-    path: HandDots/Canvas/Thumb/Thumb1
+    path: Thumb1
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -103,7 +103,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_AnchoredPosition.x
-    path: HandDots/Canvas/Thumb/Thumb1/Thumb2
+    path: Thumb1/Thumb2
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -122,7 +122,7 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
-        value: 15
+        value: 0
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -133,7 +133,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_AnchoredPosition.y
-    path: HandDots/Canvas/Thumb/Thumb1/Thumb2
+    path: Thumb1/Thumb2
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -163,7 +163,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_AnchoredPosition.x
-    path: HandDots/Canvas/Thumb/Thumb1/Thumb2/Thumb3
+    path: Thumb1/Thumb2/Thumb3
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -182,7 +182,7 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
-        value: 9
+        value: 3
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -193,7 +193,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_AnchoredPosition.y
-    path: HandDots/Canvas/Thumb/Thumb1/Thumb2/Thumb3
+    path: Thumb1/Thumb2/Thumb3
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -212,7 +212,7 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
-        value: 0
+        value: 8.199997
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -223,7 +223,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_AnchoredPosition.x
-    path: HandDots/Canvas/Thumb/Thumb1/Thumb2/Thumb3/Thumb4
+    path: Thumb1/Thumb2/Thumb3/Thumb4
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -242,7 +242,7 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
-        value: 9
+        value: 4
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -253,7 +253,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_AnchoredPosition.y
-    path: HandDots/Canvas/Thumb/Thumb1/Thumb2/Thumb3/Thumb4
+    path: Thumb1/Thumb2/Thumb3/Thumb4
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -266,7 +266,7 @@ AnimationClip:
   m_ClipBindingConstant:
     genericBindings:
     - serializedVersion: 2
-      path: 2428920271
+      path: 4242400579
       attribute: 538195251
       script: {fileID: 0}
       typeID: 224
@@ -275,7 +275,7 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-      path: 1289310154
+      path: 3767433130
       attribute: 538195251
       script: {fileID: 0}
       typeID: 224
@@ -284,7 +284,16 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-      path: 856791034
+      path: 3707825081
+      attribute: 538195251
+      script: {fileID: 0}
+      typeID: 224
+      customType: 28
+      isPPtrCurve: 0
+      isIntCurve: 0
+      isSerializeReferenceCurve: 0
+    - serializedVersion: 2
+      path: 2506413580
       attribute: 1460864421
       script: {fileID: 0}
       typeID: 224
@@ -293,7 +302,7 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-      path: 856791034
+      path: 2506413580
       attribute: 538195251
       script: {fileID: 0}
       typeID: 224
@@ -302,7 +311,7 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-      path: 3144535104
+      path: 4242400579
       attribute: 1460864421
       script: {fileID: 0}
       typeID: 224
@@ -311,16 +320,7 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-      path: 3144535104
-      attribute: 538195251
-      script: {fileID: 0}
-      typeID: 224
-      customType: 28
-      isPPtrCurve: 0
-      isIntCurve: 0
-      isSerializeReferenceCurve: 0
-    - serializedVersion: 2
-      path: 2428920271
+      path: 3767433130
       attribute: 1460864421
       script: {fileID: 0}
       typeID: 224
@@ -329,7 +329,7 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-      path: 1289310154
+      path: 3707825081
       attribute: 1460864421
       script: {fileID: 0}
       typeID: 224
@@ -349,7 +349,7 @@ AnimationClip:
     m_CycleOffset: 0
     m_HasAdditiveReferencePose: 0
     m_LoopTime: 1
-    m_LoopBlend: 1
+    m_LoopBlend: 0
     m_LoopBlendOrientation: 0
     m_LoopBlendPositionY: 0
     m_LoopBlendPositionXZ: 0
@@ -385,7 +385,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_AnchoredPosition.x
-    path: HandDots/Canvas/Thumb/Thumb1
+    path: Thumb1
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -415,7 +415,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_AnchoredPosition.y
-    path: HandDots/Canvas/Thumb/Thumb1
+    path: Thumb1
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -445,7 +445,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_AnchoredPosition.x
-    path: HandDots/Canvas/Thumb/Thumb1/Thumb2
+    path: Thumb1/Thumb2
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -464,7 +464,7 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
-        value: 15
+        value: 0
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -475,7 +475,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_AnchoredPosition.y
-    path: HandDots/Canvas/Thumb/Thumb1/Thumb2
+    path: Thumb1/Thumb2
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -505,7 +505,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_AnchoredPosition.x
-    path: HandDots/Canvas/Thumb/Thumb1/Thumb2/Thumb3
+    path: Thumb1/Thumb2/Thumb3
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -524,7 +524,7 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
-        value: 9
+        value: 3
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -535,7 +535,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_AnchoredPosition.y
-    path: HandDots/Canvas/Thumb/Thumb1/Thumb2/Thumb3
+    path: Thumb1/Thumb2/Thumb3
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -554,7 +554,7 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
-        value: 0
+        value: 8.199997
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -565,7 +565,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_AnchoredPosition.x
-    path: HandDots/Canvas/Thumb/Thumb1/Thumb2/Thumb3/Thumb4
+    path: Thumb1/Thumb2/Thumb3/Thumb4
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -584,7 +584,7 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
-        value: 9
+        value: 4
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -595,7 +595,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_AnchoredPosition.y
-    path: HandDots/Canvas/Thumb/Thumb1/Thumb2/Thumb3/Thumb4
+    path: Thumb1/Thumb2/Thumb3/Thumb4
     classID: 224
     script: {fileID: 0}
     flags: 0
