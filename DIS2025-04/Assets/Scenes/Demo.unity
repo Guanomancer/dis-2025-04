@@ -763,6 +763,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cheatSheetPanel: {fileID: 753585150}
+  deleteHand: {fileID: 1896959889}
+  rotateHand: {fileID: 1892455099}
+  scaleHand: {fileID: 487153554}
+  selectHand: {fileID: 609552565}
+  moveHand: {fileID: 1208006386}
 --- !u!1 &366013790
 GameObject:
   m_ObjectHideFlags: 0
