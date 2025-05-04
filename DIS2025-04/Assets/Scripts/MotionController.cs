@@ -16,7 +16,7 @@ public class MotionController : MonoBehaviour
     [SerializeField] private float _rotationScale = 2f;
 
     [Header("Keypoints")]
-    [SerializeField] private int _pointerKeypointBindingIndex;
+    [field: SerializeField] public int PointerKeypointBindingIndex { get; private set; }
     [Tooltip("You can assign these manually or leave blank to have them auto generated for debug dots usage.")]
     [field: SerializeField] public KeypointBinding[] KeypointBindings { get; private set; }
     [field: SerializeField] public Keypoint[] GenerateKeypointBindingsFrom { get; private set; }
@@ -71,7 +71,7 @@ public class MotionController : MonoBehaviour
                 hit.point :
                 ray.GetPoint(_defaultWorldspaceDepth);
 
-            if (i == _pointerKeypointBindingIndex)
+            if (i == PointerKeypointBindingIndex)
             {
                 if (_applyPosition && binding.Transform.TryGetComponent<CanvasRenderer>(out _))
                 {

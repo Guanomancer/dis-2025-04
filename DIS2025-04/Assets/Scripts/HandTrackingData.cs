@@ -15,6 +15,7 @@ public class HandTrackingData
         // Parse outer data
         JObject outer = JObject.Parse(json);
         DeviceID = outer["DeviceId"].ToObject<string>();
+        if (string.IsNullOrEmpty(DeviceID)) return;
         FrameIndex = outer["FrameIndex"].ToObject<int>();
 
         // Parse inner data

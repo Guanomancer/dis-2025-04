@@ -3,13 +3,15 @@ using UnityEngine.UI;
 using TMPro;
 using System;
 using System.Numerics;
+using UnityEngine.Events;
 
 public class RadialMenuController : MonoBehaviour
 {
     [Header("Button Settings")]
     public GameObject buttonPrefab;
-    public string[] labels;
     public float radius = 100f;
+    public string[] labels;
+    public UnityEvent[] actions;
 
     void Start()
     {
@@ -56,8 +58,10 @@ public class RadialMenuController : MonoBehaviour
 
     void OnButtonClick(int index)
     {
-        CloseMenu();
+        if (index >= 0 && index < actions.Length && actions[index] != null)
+            actions[index].Invoke();
 
+        CloseMenu();
     }
 
     public void OpenMenu()
@@ -71,5 +75,3 @@ public class RadialMenuController : MonoBehaviour
         gameObject.SetActive(false);
     }
 }
-
-

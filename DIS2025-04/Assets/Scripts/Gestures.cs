@@ -43,13 +43,36 @@ public class Gestures : MonoBehaviour
     private Vector3 _selectedObjectRotation;
     private Vector3 _selectedObjectScale;
     private Vector2 _selectedObjectOffsetSS;
+    private bool _selectedObjectWasKinematic;
+
+    private GameObject[] _toolIcons;
+    private GestureTool _gestureTool;
+    public GestureTool GestureTool
+    {
+        get => _gestureTool;
+        set
+        {
+            if (_gestureTool >= 0 && (int)_gestureTool < _toolIcons.Length)
+                _toolIcons[(int)_gestureTool].SetActive(false);
+            _gestureTool = value;
+            if (_gestureTool >= 0 && (int)_gestureTool < _toolIcons.Length)
+                _toolIcons[(int)_gestureTool].SetActive(true);
+        }
+    }
+
+    public void SetGestureTool(int index) => GestureTool = (GestureTool)index;
 
     #region Static fields
     private static Gestures _instance;
     public static HandTrackingData HandTracking => _instance != null ? _instance._handTracker : null;
     public static GameObject CurrentHover => _instance != null ? _instance._currentHover : null;
     public static GameObject CurrentSelected => _instance != null ? _instance._currentSelected : null;
-    public static GestureTool CurrentTool { get; set; } = GestureTool.Move;
+
+    public static GestureTool CurrentTool
+    {
+        get => _instance != null ? _instance.GestureTool : default;
+        set { if (_instance != null) _instance.GestureTool = value; }
+    }
     #endregion
 
     private void Awake()
@@ -174,7 +197,7 @@ public class Gestures : MonoBehaviour
                         _currentSelected.transform.eulerAngles = _selectedObjectRotation + new Vector3(deltaPosSS.y, deltaPosSS.x, 0f) * .1f;
                         break;
                     case GestureTool.Scale:
-                        _currentSelected.transform.localScale = _selectedObjectScale + new Vector3(deltaPosSS.x, deltaPosSS.y, 0f) * .1f;
+                        _currentSelected.transform.localScale = _selectedObjectScale + new Vector3(deltaPosSS.x, deltaPosSS.y, 0f) * .01f;
                         break;
                     case GestureTool.Yeet:
                         if (!_currentSelected.TryGetComponent<Rigidbody>(out var rigidbody))
@@ -253,6 +276,9 @@ public class Gestures : MonoBehaviour
 
     protected virtual void OnSelectionChanged(GameObject newSelection)
     {
+        if (_currentSelected != null && _currentSelected.TryGetComponent<Rigidbody>(out var rb))
+            rb.isKinematic = false;
+
         _onSelectionChanged?.Invoke(newSelection);
         _currentSelected = newSelection;
         if (_currentSelected != null)
@@ -263,6 +289,17 @@ public class Gestures : MonoBehaviour
             _selectedObjectOffset = _currentHover.transform.position;
             _selectedObjectRotation = _currentHover.transform.eulerAngles;
             _selectedObjectScale = _currentHover.transform.localScale;
+
+            if (_currentSelected.TryGetComponent<Rigidbody>(out rb))
+            {
+                _selectedObjectWasKinematic = rb.isKinematic;
+                rb.isKinematic = true;
+            }
+        }
+
+        if (_gestureTool == GestureTool.None)
+        {
+            _radialMenuController.OpenMenu();
         }
     }
 
@@ -277,6 +314,14 @@ public class Gestures : MonoBehaviour
             keypoint.Transform = go.transform;
             keypointBindings[i] = keypoint;
             go.GetComponent<Image>().color = GetColorFromKeypointIndex(i);
+            if (i == _motionController.PointerKeypointBindingIndex)
+            {
+                var iconsRenderers = go.GetComponentsInChildren<Image>(true);
+                _toolIcons = new GameObject[iconsRenderers.Length - 1];
+                for (int j = 0; j < iconsRenderers.Length - 1; j++)
+                    _toolIcons[j] = iconsRenderers[j + 1].gameObject;
+                _toolIcons[(int)_gestureTool].SetActive(true);
+            }
             go.SetActive(true);
         }
     }
