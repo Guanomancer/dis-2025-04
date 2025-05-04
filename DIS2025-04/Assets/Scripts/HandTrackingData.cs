@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,14 +13,64 @@ public class HandTrackingData
     public Dictionary<string, Keypoint> Keypoints = new Dictionary<string, Keypoint>();
     public void DeserializeJSON(string json)
     {
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            Debug.LogError("Input JSON is empty or null!");
+            return;
+        }
+
         // Parse outer data
-        JObject outer = JObject.Parse(json);
+        JObject outer;
+
+        try
+        {
+            outer = JObject.Parse(json);
+        }
+        catch (JsonReaderException ex)
+        {
+            Debug.LogError($"Invalid input JSON: {ex.Message}\n{json}");
+            return;
+        }
+
+
         DeviceID = outer["DeviceId"].ToObject<string>();
         if (string.IsNullOrEmpty(DeviceID)) return;
         FrameIndex = outer["FrameIndex"].ToObject<int>();
 
+        var frameDataString = outer["FrameDataJson"].ToObject<string>();
+        var test = outer["FrameDataJson"].ToString();
+
+        if (test.Length != frameDataString.Length)
+        {
+            Debug.LogError("string mismatch");
+        }
+
+        if (string.IsNullOrEmpty(frameDataString))
+        {
+            Debug.LogError("FrameDataJson is null or empty!");
+            return;
+        }
+
+        JArray frameDataArray;
+        try
+        {
+            frameDataArray = JArray.Parse(frameDataString);
+        }
+        catch (JsonReaderException ex)
+        {
+            Debug.LogError($"Invalid FrameDataJson: {ex.Message}\n{frameDataString}");
+            return;
+        }
+
+        if (frameDataArray.Count == 0)
+        {
+            Debug.LogError("FrameDataJson array is empty!");
+            return;
+        }
+
+
         // Parse inner data
-        JObject innerData = (JObject)JArray.Parse(outer["FrameDataJson"].ToString())[0];
+        JObject innerData = (JObject)frameDataArray[0];
         JArray keypoints = (JArray)innerData["Keypoints"];
         JArray keypoints3D = (JArray)innerData["Keypoints3D"];
 
