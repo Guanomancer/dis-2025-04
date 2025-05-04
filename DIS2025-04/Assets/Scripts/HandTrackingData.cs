@@ -58,8 +58,8 @@ public class HandTrackingData
         }
         catch (JsonReaderException ex)
         {
-            Debug.LogError($"Invalid FrameDataJson: {ex.Message}\n{frameDataString}");
             return;
+            // Debug.LogError($"Invalid FrameDataJson: {ex.Message}\n{frameDataString}");
         }
 
         if (frameDataArray.Count == 0)
