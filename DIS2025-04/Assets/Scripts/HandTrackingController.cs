@@ -60,11 +60,16 @@ public class HandTrackingController : MonoBehaviour
         if (handTrackingData.Keypoints.Count == 0)
             return false;
 
-        if (handTrackingData.Keypoints.TryGetValue("thumb_tip", out var thumb) &&
-            handTrackingData.Keypoints.TryGetValue("index_finger_tip", out var index))
+        if (handTrackingData.Keypoints.TryGetValue("thumb_tip", out var thumbTip) &&
+            handTrackingData.Keypoints.TryGetValue("index_finger_tip", out var indexTip) &&
+            handTrackingData.Keypoints.TryGetValue("index_finger_dip", out var indexDip) &&
+            handTrackingData.Keypoints.TryGetValue("thumb_ip", out var thumbDip))
         {
-            float distance = Vector2.Distance(thumb.screenPosition, index.screenPosition);
-            return distance < pinchThreshold;
+            float tipDistance = Vector2.Distance(thumbTip.screenPosition, indexTip.screenPosition);
+            
+            float dipDistance = Vector2.Distance(thumbDip.screenPosition, indexDip.screenPosition);
+            
+            return (tipDistance < pinchThreshold) && (dipDistance > pinchThreshold);
         }
 
         return false;
