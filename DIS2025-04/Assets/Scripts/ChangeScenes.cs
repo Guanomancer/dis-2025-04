@@ -41,6 +41,7 @@ public class ChangeScenes : MonoBehaviour
     
     public void QuitApp()
     {
+        Debug.Log("Quit button clicked! (won’t quit in Editor)");
         Application.Quit();
         
     }
