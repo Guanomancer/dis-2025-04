@@ -12,9 +12,9 @@ We have tried to make the project extensible, as this is only a demonstration. I
 
 ## Contributers
 (Name, Organization, Role)
-- Ethan Kabatchnik, DIS computer science student, Systems Engineering for Unity plugin.
-- Sarah Than, DIS computer science student, UI and UX engineering for Unity plugin.
-- Troels Windekilde, Guanomancer ApS, Tech lead and Web development.
+- [Ethan Kabatchnik](https://github.com/e-kab), DIS computer science student, Systems Engineering for Unity plugin.
+- [Sarah Than](https://github.com/sarahthan123), DIS computer science student, UI and UX engineering for Unity plugin.
+- Troels Windekilde, Guanomancer ApS, Tech lead and ML.js integration.
 
 ## Getting started
 The Unity project has a Demo scene. When running it, hit the Launch Browser button.
