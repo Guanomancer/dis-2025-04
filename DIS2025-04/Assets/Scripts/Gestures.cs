@@ -438,10 +438,6 @@ public class Gestures : MonoBehaviour
 
         return _instance._motionController.CurrentPositionWS;
     }
-
-    //event GestureChanged(NewGesture)
-    //event OnGesture(Gesture)
-    //event OnSelectionChanged(NewSelection, OldSelection)
 }
 
 public enum GestureTool
