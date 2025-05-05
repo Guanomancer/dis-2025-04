@@ -141,36 +141,218 @@ Keypoint thumbTipClone = thumbTip.Clone();
 
 ## 2. HandTrackingData Class
 
-The HandTrackingData class manages the deserialization and organization of raw JSON hand tracking data.
+A data manager class for handling real-time hand tracking frames in Unity, including robust JSON deserialization, storage, and debugging utilities.
 
-- **Deserialization**: The `DeserializeJSON(string json)` method robustly parses the nested JSON data, extracting the device ID, frame index, handedness, confidence level, and individual keypoints.
-- **Data Storage**: Keypoints are stored in a `Dictionary<string, Keypoint>`, allowing quick lookups by name.
-- **Error Handling**: The deserialization process includes extensive validation to ensure stability even with incomplete or corrupted input.
-- **Debugging**: A detailed `ToString()` override outputs a readable summary of the frame data, useful for logging or debugging.
+## Overview
 
-This class acts as the main bridge between the raw API stream and Unity's internal data structures.
+The `HandTrackingData` class bridges the gap between incoming raw JSON data and Unity's runtime data structures, providing clean access to hand tracking information, including device ID, frame index, handedness, confidence, and keypoints.
+
+## Features
+
+- **Device Information**:
+  - `DeviceID` — the device identifier.
+  - `FrameIndex` — the index of the frame being processed.
+  - `Handedness` — whether the hand is left or right.
+  - `Confidence` — the confidence level of tracking data.
+
+- **Keypoint Management**:
+  - `Keypoints` — a `Dictionary<string, Keypoint>` storing keypoints by their names for fast retrieval.
+
+## Public Methods
+
+| Method | Description |
+| :----- | :---------- |
+| `void DeserializeJSON(string json)` | Parses and deserializes a raw JSON string containing hand tracking frame data into structured Unity objects. |
+| `override string ToString()` | Returns a human-readable summary of the hand tracking data for easy debugging and logging. |
+
+## Detailed Method Breakdown
+
+### DeserializeJSON(string json)
+
+Parses a multi-layered JSON structure into usable Unity objects:
+
+- **Validation**:
+  - Checks for empty or null JSON input.
+  - Handles invalid or corrupted JSON with error reporting.
+- **Deserialization**:
+  - Parses outer JSON (device ID, frame index, and frame data string).
+  - Parses nested `FrameDataJson` (array of keypoints and 3D keypoints).
+  - Extracts handedness and confidence.
+  - Creates or updates `Keypoint` instances based on the parsed data.
+- **Error Handling**:
+  - Includes multiple fallback points to prevent crashes if data is missing or malformed.
+
+### ToString()
+
+Generates a multi-line string summarizing:
+
+- Device ID
+- Frame Index
+- Handedness
+- Confidence
+- All available keypoints and their details
+
+## Usage Example
+
+```csharp
+// Assume you have a JSON string from your tracking API
+string rawJson = GetHandTrackingJson();
+
+// Create a new HandTrackingData instance
+HandTrackingData handData = new HandTrackingData();
+
+// Populate it
+handData.DeserializeJSON(rawJson);
+
+// Access keypoints
+if (handData.Keypoints.TryGetValue("ThumbTip", out Keypoint thumbTip))
+{
+    Debug.Log($"ThumbTip Position: {thumbTip.screenPosition}");
+}
+
+// Print all tracking data
+Debug.Log(handData.ToString());
+```
+
+## Notes
+
+- **Dependency**: Requires [Newtonsoft.Json](https://www.newtonsoft.com/json) (Json.NET) for JSON parsing.
+- **Unity Integration**: Uses `ScriptableObject` to create `Keypoint` instances at runtime.
+- **Design Philosophy**: Prioritizes robustness and stability — designed to tolerate incomplete or inconsistent JSON data.
+
+---
 
 ## 3. HandTrackingController Component
 
-The HandTrackingController is a `MonoBehaviour` that listens for hand gestures in real-time.
+A modular and extensible Unity MonoBehaviour for detecting hand gestures using screen-space keypoint tracking data.
 
-**Gesture Detection:**
+## Overview
 
-- **Pinch**: Recognized based on distance between thumb and index finger tips.
-- **Thumbs Up**: Recognized based on thumb orientation and relative finger positions.
+The `HandTrackingController` handles real-time gesture detection based on hand keypoints. It processes incoming `HandTrackingData`, detects gestures such as **Pinch** and **Thumbs Up**, and triggers Unity events when gestures are detected or end.
 
-**Threshold Parameters**:  
-Sensitivity and timing for gesture detection are customizable via inspector-exposed parameters like `pinchThreshold`, `thumbsUpThreshold`, `detectionHoldTime`, and `lostHoldTime`.
+## Features
 
-**Event System:**
+- **Event Triggers**:
+  - `OnGestureDetected` — called when a gesture is detected and held for a configured duration.
+  - `OnGestureEnded` — called when a detected gesture is lost for a configured duration.
 
-- `OnGestureDetected`: Invoked when a gesture is successfully detected and held.
-- `OnGestureEnded`: Invoked when a gesture is no longer detected after a grace period.
+- **Timing Control**:
+  - `detectionHoldTime` — how long a gesture must be held to trigger detection.
+  - `lostHoldTime` — how long a gesture must be lost before ending.
 
-**Public Methods:**
+- **Threshold Customization**:
+  - `pinchThreshold` — distance in screen space between thumb and index for pinch detection.
+  - `thumbsUpThreshold` — angular deviation allowed for thumbs up detection.
 
-- `UpdateHandTrackingData(string json)`: Manually update the controller with new JSON data if needed.
-- `LogGestureDetected()` and `LogGestureEnded()`: Simple debug utilities for logging events.
+- **Gesture Tracking**:
+  - Detects gestures using simple, robust screen-space logic.
+  - `GestureType` enum enables clean and scalable gesture categorization.
 
-This component provides an event-driven architecture for integrating hand gestures into gameplay mechanics, UI interactions, or any other dynamic behavior in Unity.
+- **Easy Gesture Expansion**:
+  - Adding new gestures only requires implementing a new `DetectXXX` method that returns a `GestureType`.
 
+## Public Properties
+
+| Property | Type | Description |
+| :------- | :--- | :----------- |
+| `GestureType CurrentGesture` | `GestureType` | Current active gesture, or `None`. |
+
+## Public Methods
+
+| Method | Description |
+| :----- | :----------- |
+| `void UpdateHandTrackingData(string json)` | Updates internal hand tracking data from a JSON string. |
+| `GestureType DetectPinch(HandTrackingData data)` | Detects a pinch gesture based on keypoint proximity. |
+| `GestureType DetectThumbsUp(HandTrackingData data)` | Detects a thumbs-up gesture based on thumb orientation and position. |
+| `void LogGestureDetected()` | Debug log when a gesture is detected. |
+| `void LogGestureEnded()` | Debug log when a gesture ends. |
+
+## Gesture Detection Logic
+
+Each frame:
+- Attempts to detect a gesture with `DetectGesture()`.
+- If a gesture is detected:
+  - Starts a timer (`gestureTimer`).
+  - When held long enough (`detectionHoldTime`), triggers `OnGestureDetected`.
+- If no gesture is detected:
+  - Starts a lost timer (`lostTimer`).
+  - When lost long enough (`lostHoldTime`), triggers `OnGestureEnded`.
+
+Gesture-specific detection (like pinch or thumbs up) is cleanly separated into their own methods (`DetectPinch`, `DetectThumbsUp`).
+
+### How New Gestures Can Be Added
+
+**Step 1** — Create a new detection function:
+
+```csharp
+public GestureType DetectWave(HandTrackingData handTrackingData)
+{
+    // Add wave detection logic here
+    return GestureType.Wave;
+}
+```
+
+**Step 2** — Add it into the main `DetectGesture()` method:
+
+```csharp
+gesture = DetectWave(handTrackingData);
+if (gesture == GestureType.Wave)
+    return GestureType.Wave;
+```
+
+**Step 3** — Extend the `GestureType` enum:
+
+```csharp
+public enum GestureType
+{
+    None,
+    Pinch,
+    ThumbsUp,
+    Wave  // <- newly added
+}
+```
+
+This design **keeps all gestures independent** and **makes gesture management scalable** without cluttering the `Update()` logic.
+
+---
+
+## Usage Example
+
+```csharp
+public class HandTrackingInputManager : MonoBehaviour
+{
+    public HandTrackingController handController;
+
+    void Start()
+    {
+        handController.OnGestureDetected.AddListener(OnGestureDetected);
+        handController.OnGestureEnded.AddListener(OnGestureEnded);
+    }
+
+    void Update()
+    {
+        string incomingJson = GetHandTrackingJsonFromDevice();
+        handController.UpdateHandTrackingData(incomingJson);
+    }
+
+    void OnGestureDetected()
+    {
+        Debug.Log($"Gesture Detected: {handController.CurrentGesture}");
+    }
+
+    void OnGestureEnded()
+    {
+        Debug.Log("Gesture Ended");
+    }
+}
+```
+
+---
+
+## Notes
+
+- **Dependency**: Requires the `HandTrackingData` class and its populated keypoints.
+- **Gesture Sensitivity**: Can be finely tuned via thresholds (`pinchThreshold`, `thumbsUpThreshold`) and timing variables (`detectionHoldTime`, `lostHoldTime`).
+- **Best Practice**: Add only one gesture detection at a time to keep performance high and maintain clean gesture priority ordering.
+
+---
