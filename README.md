@@ -71,3 +71,106 @@ You can find more info here: [SmartMerge](https://docs.unity3d.com/Manual/SmartM
   trustExitCode = false
   cmd = '<path to UnityYAMLMerge>' merge -p "$BASE" "$REMOTE" "$LOCAL" "$MERGED"
 ```
+
+# Hand Tracking Module Overview
+
+This module processes real-time hand tracking data from an API stream and makes it easily usable within Unity. It is composed of three main components:
+
+## 1. Keypoint Class
+
+A flexible `ScriptableObject` representing a single tracked point for hand tracking in Unity, supporting both 2D and 3D data.
+
+## Overview
+
+The `Keypoint` class is designed to represent individual hand keypoints (e.g., fingertips, joints) for real-time tracking applications. It includes metadata, 2D/3D positional data, hierarchical parenting, and several utility methods to ease working with keypoint data across Unity projects.
+
+## Features
+
+- **Metadata**: 
+  - `keypointName` — the name of the keypoint for identification.
+- **Tracked Positions**:
+  - `screenPosition` — the 2D position of the keypont in the camera capture window, ideal for screen-space or UI interactions.
+  - `rotation` — a 3D vector representing rotation of the keypoint
+- **Parent Keypoint**:
+  - Optional reference to another `Keypoint`, allowing hierarchical relationships (e.g., a fingertip as a child of a finger joint).
+
+## Public Methods
+
+| Method | Description |
+| :----- | :---------- |
+| `Vector2 ToVector2()` | Returns the `screenPosition` as a `Vector2`. |
+| `static implicit operator Vector2(Keypoint k)` | Allows implicit conversion of a `Keypoint` into its `Vector2` screen position. |
+| `static Keypoint FromVector2(string name, Vector2 vec)` | Creates a new `Keypoint` from a `Vector2` and a name. |
+| `Keypoint Clone()` | Creates a deep copy of the `Keypoint`. |
+| `void Deconstruct(out string name, out Vector2 screenPos, out Vector3 rotationVector)` | Allows deconstruction into individual fields for tuple unpacking. |
+| `override string ToString()` | Returns a readable string representation. |
+| `override bool Equals(object obj)` | Compares two `Keypoint` instances based on `keypointName` and `screenPosition`. |
+| `override int GetHashCode()` | Generates a hash code based on `keypointName` and `screenPosition`. |
+
+## Inspector Setup
+
+When creating a `Keypoint` in Unity (via **Assets > Create > Hand Tracking > Keypoint**), you will see the following fields:
+
+- **Keypoint Name**: Assign a unique name for identification.
+- **Screen Position (Vector2)**: Set initial 2D screen coordinates.
+- **Rotation (Vector3)**: Set initial 3D rotation/position.
+- **Parent Keypoint**: (Optional) Link to a parent keypoint for hierarchy.
+
+## Usage Example
+
+```csharp
+// Creating a keypoint from Vector2
+Keypoint thumbTip = Keypoint.FromVector2("ThumbTip", new Vector2(0.5f, 0.9f));
+
+// Implicitly converting Keypoint to Vector2
+Vector2 screenPos = thumbTip;
+
+// Cloning a keypoint
+Keypoint thumbTipClone = thumbTip.Clone();
+
+// Deconstructing a keypoint
+(string name, Vector2 pos, Vector3 rot) = thumbTip;
+```
+
+## Notes
+
+- `Keypoint` is implemented as a `ScriptableObject` for reusability across scenes and ease of asset creation.
+- Designed to be extensible for future tracking systems or hierarchical animations.
+
+---
+
+## 2. HandTrackingData Class
+
+The HandTrackingData class manages the deserialization and organization of raw JSON hand tracking data.
+
+- **Deserialization**: The `DeserializeJSON(string json)` method robustly parses the nested JSON data, extracting the device ID, frame index, handedness, confidence level, and individual keypoints.
+- **Data Storage**: Keypoints are stored in a `Dictionary<string, Keypoint>`, allowing quick lookups by name.
+- **Error Handling**: The deserialization process includes extensive validation to ensure stability even with incomplete or corrupted input.
+- **Debugging**: A detailed `ToString()` override outputs a readable summary of the frame data, useful for logging or debugging.
+
+This class acts as the main bridge between the raw API stream and Unity's internal data structures.
+
+## 3. HandTrackingController Component
+
+The HandTrackingController is a `MonoBehaviour` that listens for hand gestures in real-time.
+
+**Gesture Detection:**
+
+- **Pinch**: Recognized based on distance between thumb and index finger tips.
+- **Thumbs Up**: Recognized based on thumb orientation and relative finger positions.
+
+**Threshold Parameters**:  
+Sensitivity and timing for gesture detection are customizable via inspector-exposed parameters like `pinchThreshold`, `thumbsUpThreshold`, `detectionHoldTime`, and `lostHoldTime`.
+
+**Event System:**
+
+- `OnGestureDetected`: Invoked when a gesture is successfully detected and held.
+- `OnGestureEnded`: Invoked when a gesture is no longer detected after a grace period.
+
+**Public Methods:**
+
+- `UpdateHandTrackingData(string json)`: Manually update the controller with new JSON data if needed.
+- `LogGestureDetected()` and `LogGestureEnded()`: Simple debug utilities for logging events.
+
+This component provides an event-driven architecture for integrating hand gestures into gameplay mechanics, UI interactions, or any other dynamic behavior in Unity.
+
