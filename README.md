@@ -1,6 +1,19 @@
 # Motion Control System for Unity
 Colab project with DIS Study Abroad computer science students, April 2025
 
+# Table of Contents
+- [Brief](#brief)
+- [Contributors](#contributors)
+- [Getting Started](#getting-started)
+- [Requirements For Contributors](#requirements-for-contributors)
+  - [SmartMerge - Windows](#windows)
+  - [SmartMerge - Mac OSX](#mac-osx)
+  - [SmartMerge - Other](#other)
+- [Hand Tracking Module Overview](#hand-tracking-module-overview)
+  - [1. Keypoint Class](#1-keypoint-class)
+  - [2. HandTrackingData Class](#2-handtrackingdata-class)
+  - [3. HandTrackingController Component](#3-handtrackingcontroller-component)
+
 ## Brief
 This Motion Control System is a basic framework, intended to demonstrate how to use cheap webcams and phone cameras to capture and identify geometric keypoints for hands, and applying them to GameObjects in Unity in real-time.
 
