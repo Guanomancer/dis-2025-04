@@ -154,6 +154,11 @@ public class Gestures : MonoBehaviour
 
     private void OnDestroy()
     {
+        if (_httpHost != null)
+        {
+            _httpHost.Dispose();
+            _httpHost = null;
+        }
         if (_instance != this) return;
 
         _instance = null;

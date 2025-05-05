@@ -4,7 +4,7 @@ using System.Net;
 using System.Text;
 using UnityEngine;
 
-public class HttpHost
+public class HttpHost : IDisposable
 {
     private const int HTTP_POST_BUFFER_SIZE = 10240;
 
@@ -185,6 +185,12 @@ public class HttpHost
         //Debug.Log($"Retrieved frame #{frame.FrameIndex} with {json}");
 
         return json;
+    }
+
+    public void Dispose()
+    {
+        try { ((IDisposable)_listener).Dispose(); }
+        catch { }
     }
 }
 
