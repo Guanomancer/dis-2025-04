@@ -8,6 +8,24 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Demo.unity
     guid: 195a5acd73d347c4aab94828c70bd708
+  - enabled: 1
+    path: Assets/Scenes/ActionMenu.unity
+    guid: 997f9b347b33a478f99a25cc2d9a59b2
+  - enabled: 1
+    path: Assets/Scenes/Delete.unity
+    guid: 20d0695312d2a453693352b7efeee14c
+  - enabled: 1
+    path: Assets/Scenes/Edit.unity
+    guid: c027bbc58752f41a6b3c57879e705b97
+  - enabled: 1
+    path: Assets/Scenes/Move.unity
+    guid: dd95c1e43a6554b879fc1ea797a6bd22
+  - enabled: 1
+    path: Assets/Scenes/Rotate.unity
+    guid: 7c852a62f3271455092331c8163a3579
+  - enabled: 1
+    path: Assets/Scenes/Scale.unity
+    guid: 31869e904e15f4f09adc5b474d4ab041
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

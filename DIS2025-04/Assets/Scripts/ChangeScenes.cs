@@ -31,6 +31,24 @@ public class ChangeScenes : MonoBehaviour
     {
         SceneManager.LoadScene("ActionMenu");
     }
+
+    public void RestartScene()
+    {
+        Scene currentScene = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(currentScene.name);
+    }
+
     
-    
+    public void QuitApp()
+    {
+        Application.Quit();
+        
+    }
+
+    public void GoToDemoScene()
+    {
+        SceneManager.LoadScene("Demo");
+    }
+
+
 }
