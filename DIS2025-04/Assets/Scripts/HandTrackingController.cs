@@ -74,10 +74,28 @@ public class HandTrackingController : MonoBehaviour
     {
 
         var handTrackingData = Gestures.HandTracking;
+        GestureType gesture = GestureType.None;
 
         if (handTrackingData.Keypoints.Count == 0)
             return GestureType.None;
 
+        gesture = DetectPinch(handTrackingData);
+
+        if (gesture == GestureType.Pinch)
+        {
+            return GestureType.Pinch;
+        }
+
+        gesture = DetectThumbsUp(handTrackingData);
+
+        return gesture;
+
+        
+
+    }
+
+    public GestureType DetectPinch(HandTrackingData handTrackingData)
+    {
         // Detect Pinch
         if (handTrackingData.Keypoints.TryGetValue("thumb_tip", out var thumbTip) &&
             handTrackingData.Keypoints.TryGetValue("index_finger_tip", out var indexTip) &&
@@ -85,19 +103,23 @@ public class HandTrackingController : MonoBehaviour
             handTrackingData.Keypoints.TryGetValue("thumb_ip", out var thumbDip))
         {
             float tipDistance = Vector2.Distance(thumbTip.screenPosition, indexTip.screenPosition);
-            
+
             float dipDistance = Vector2.Distance(thumbDip.screenPosition, indexDip.screenPosition);
-            
+
             if ((tipDistance < pinchThreshold) && (dipDistance > pinchThreshold))
             {
                 return GestureType.Pinch;
             }
         }
+        return GestureType.None;
+    }
 
+    public GestureType DetectThumbsUp(HandTrackingData handTrackingData)
+    {
         // Detect ThumbsUp
-        if (handTrackingData.Keypoints.TryGetValue("thumb_tip", out thumbTip) &&
-            handTrackingData.Keypoints.TryGetValue("thumb_ip", out thumbDip) &&
-            handTrackingData.Keypoints.TryGetValue("index_finger_tip", out indexTip) &&
+        if (handTrackingData.Keypoints.TryGetValue("thumb_tip", out var thumbTip) &&
+            handTrackingData.Keypoints.TryGetValue("thumb_ip", out var thumbDip) &&
+            handTrackingData.Keypoints.TryGetValue("index_finger_tip", out var indexTip) &&
             handTrackingData.Keypoints.TryGetValue("middle_finger_tip", out var middleTip) &&
             handTrackingData.Keypoints.TryGetValue("ring_finger_tip", out var ringTip) &&
             handTrackingData.Keypoints.TryGetValue("pinky_finger_tip", out var pinkyTip))
@@ -128,7 +150,6 @@ public class HandTrackingController : MonoBehaviour
             }
         }
         return GestureType.None;
-
     }
 
     public void UpdateHandTrackingData(string json)
