@@ -13,6 +13,9 @@ public class HandTrackingController : MonoBehaviour
 
     [Tooltip("Distance threshold for pinch detection")]
     public float pinchThreshold = 10f;
+
+    [Tooltip("Angle threshold for thumbs up detection")]
+    public float thumbsUpThreshold = 20f;
     [Tooltip("200ms to trigger")]
     public float detectionHoldTime = 0.2f;
     [Tooltip("200ms to de-trigger")]
@@ -105,7 +108,7 @@ public class HandTrackingController : MonoBehaviour
             // Up vector in screen space is (0, 1)
             float angleToUp = Vector2.Angle(thumbDirection, Vector2.up);
 
-            bool thumbIsVertical = Mathf.Abs(angleToUp - 180f) <= 20f;
+            bool thumbIsVertical = Mathf.Abs(angleToUp - 180f) <= thumbsUpThreshold;
 
 
             // Thumb is higher than all other fingers
