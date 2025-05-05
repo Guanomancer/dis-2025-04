@@ -328,9 +328,15 @@ public class Gestures : MonoBehaviour
 
     private void GestureDetected()
     {
-        if (PerformUiInteraction()) return;
-        if (PerformWorldInteraction()) return;
-        if (PerformMenuAccess()) return;
+        if (_handTrackingController.CurrentGesture == HandTrackingController.GestureType.ThumbsUp)
+        {
+            if (PerformMenuAccess()) return;
+        }
+        else if (_handTrackingController.CurrentGesture == HandTrackingController.GestureType.Pinch)
+        {
+            if (PerformUiInteraction()) return;
+            if (PerformWorldInteraction()) return;
+        }
 
         #region Local Methods
         bool PerformUiInteraction()

@@ -26,6 +26,7 @@ public class HandTrackingController : MonoBehaviour
     private float lostTimer = 0f;                // Timer to track time gesture is *not* detected
 
     private GestureType currentGesture = GestureType.None; // Track the gesture
+    public GestureType CurrentGesture => currentGesture;
 
 
     private void Update()
